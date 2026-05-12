@@ -3,7 +3,7 @@ import pymysql,os,dotenv
 
 dotenv.load_dotenv()
 
-class DbPassUpdate:
+class DataBaseCon:
     
     
     @staticmethod
