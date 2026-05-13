@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 class Transaction(BaseModel):
     value: Decimal = Field(max_digits=19, decimal_places=4, gt=0)
     data : datetime
-    cpf : str       
-    location : str
+    cpf : str = Field(strip_whitespace=True)
+    location : str 
     storeID: int
 
     @field_validator("cpf")

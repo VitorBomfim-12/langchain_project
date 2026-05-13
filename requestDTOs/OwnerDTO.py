@@ -1,9 +1,9 @@
-import pydantic
 from pydantic import BaseModel, field_validator, Field
 from validate_docbr import CPF
 class Owner(BaseModel):
-    name:str 
-    cpf:str
+    name:str = Field(strip_whitespace=True)
+    cpf:str = Field(strip_whitespace=True)
+    
 
     @field_validator('cpf')
     @classmethod
@@ -16,11 +16,11 @@ class Owner(BaseModel):
         return v
 
 
-    @field_validator(name)
+    @field_validator("name")
     @classmethod
     def validate_cnpj(cls,v:str)->str:
         
-        if not v:
+        if not v or not v.strip():
             raise ValueError("Nome invalido.")
         
         return v

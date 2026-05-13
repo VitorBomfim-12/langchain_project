@@ -4,10 +4,10 @@ from validate_docbr import CNPJ
 
 
 class StoreDTO(BaseModel):
-    storeName:str
-    cnpj:str
-    mccCode:str
-    location:str
+    storeName:str = Field(strip_whitespace=True)
+    cnpj:str = Field(strip_whitespace=True)
+    mccCode:str = Field(strip_whitespace=True)
+    location:str 
 
     @field_validator
     @classmethod
