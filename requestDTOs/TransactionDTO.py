@@ -2,10 +2,11 @@ import pydantic,re
 from pydantic import BaseModel,Field, field_validator
 from decimal import Decimal
 from datetime import datetime, timezone
+from validate_docbr import CPF
 
 
 class Transaction(BaseModel):
-    value: Decimal = Field(max_digits=19, decimal_places=4, gt=0)
+    value: Decimal = Field(max_digits=19, decimal_places=4)
     data : datetime
     cpf : str = Field(strip_whitespace=True)
     location : str 
@@ -14,11 +15,10 @@ class Transaction(BaseModel):
     @field_validator("cpf")
     @classmethod
     def validate_cpf_format(cls, v: str) -> str:
-        
-        cpfClean = re.sub(r'\D', '', v)
-        if len(cpfClean) != 11:
-            raise ValueError('CPF deve conter 11 dígitos numéricos')
-        return cpfClean
+        validator = CPF()
+        if not validator.validate(v):
+            raise ValueError("CPF inválido")
+        return v
     
     @field_validator('data')
     @classmethod
