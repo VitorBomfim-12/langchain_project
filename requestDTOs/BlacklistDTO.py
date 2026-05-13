@@ -10,7 +10,7 @@ class Blacklist(BaseModel):
 
     @field_validator('identifierCPF')
     @classmethod
-    def validate_cnpj(cls,v:str)->str:
+    def validate_cpf(cls,v:str)->str:
         validator = CPF()
 
         if not validator.validate(v):
