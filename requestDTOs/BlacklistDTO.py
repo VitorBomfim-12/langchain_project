@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field, field_validator
 from validate_docbr import CPF
+from models import RiskEnum
 
 class Blacklist(BaseModel):
     identifierCPF:str = Field(strip_whitespace=True)
-    severityLevel:str  = Field(strip_whitespace=True)
+    severityLevel: RiskEnum
     storeIdFk:int
     reason:str
 
@@ -13,6 +14,8 @@ class Blacklist(BaseModel):
         validator = CPF()
 
         if not validator.validate(v):
-            raise ValueError("CPF inválido")
-        
+            raise ValueError("CPF inválido.")
+
         return v
+    
+    
