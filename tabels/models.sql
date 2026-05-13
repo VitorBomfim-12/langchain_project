@@ -45,7 +45,7 @@ identifier VARCHAR(255) NOT NULL,
 added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 severity_level ENUM('LOW','MEDIUM','HIGH'),
 store_id_FK INT NOT NULL,
-FOREIGN KEY (store_id_FK) REFERENCES store(id) ON DELETE CASCADE
+FOREIGN KEY (store_id_FK) REFERENCES store(id) ON DELETE CASCADE,
 reason TEXT
 );
 
