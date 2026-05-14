@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from validate_docbr import CPF
 
 
-class Transaction(BaseModel):
+class TransactionDTO(BaseModel):
     value: Decimal = Field(max_digits=19, decimal_places=4)
     data : datetime
     cpf : str = Field(strip_whitespace=True)

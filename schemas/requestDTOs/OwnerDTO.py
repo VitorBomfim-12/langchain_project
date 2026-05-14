@@ -1,6 +1,6 @@
 from pydantic import BaseModel, field_validator, Field
 from validate_docbr import CPF
-class Owner(BaseModel):
+class OwnerDTO(BaseModel):
     name:str = Field(strip_whitespace=True)
     cpf:str = Field(strip_whitespace=True)
     
