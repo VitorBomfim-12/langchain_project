@@ -1,9 +1,10 @@
 from pydantic import BaseModel, field_validator, Field
 from validate_docbr import CPF
+from datetime import date
 class OwnerDTO(BaseModel):
     name:str = Field(strip_whitespace=True)
     cpf:str = Field(strip_whitespace=True)
-    
+    birthday : date
 
     @field_validator('cpf')
     @classmethod
