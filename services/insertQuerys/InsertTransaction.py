@@ -1,5 +1,7 @@
 from services.DbSetup import DataBaseCon as DBC
 from schemas.requestDTOs.TransactionDTO import TransactionDTO
+from services.selectQuerys.ActiveStoreQuery import ActiveStore
+
 import pymysql
 
 class InsertTransaction:
@@ -7,6 +9,8 @@ class InsertTransaction:
     @staticmethod
     def insertTransaction(t:TransactionDTO):
         
+        if not ActiveStore(t.storeID):
+                return "Estabelecimento inativo"
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:
