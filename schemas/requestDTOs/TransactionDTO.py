@@ -3,6 +3,7 @@ from pydantic import BaseModel,Field, field_validator
 from decimal import Decimal
 from datetime import datetime, timezone
 from validate_docbr import CPF
+from models.TransactionStatusEnum import StatusEnum
 
 
 class TransactionDTO(BaseModel):
@@ -10,6 +11,8 @@ class TransactionDTO(BaseModel):
     data : datetime
     cpf : str = Field(strip_whitespace=True)
     location : str 
+    status: StatusEnum
+    reason:str
     storeID: int
 
     @field_validator("cpf")

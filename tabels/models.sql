@@ -33,7 +33,7 @@ transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 transaction_cpf VARCHAR(255) NOT NULL,
 transaction_location POINT NOT NULL SRID 4326,
 SPATIAL INDEX (transaction_location),
-transaction_status ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+transaction_status ENUM('PENDING','APPROVED','REJECTED','CHARGEBACK') DEFAULT 'PENDING',
 reason TEXT,
 transaction_store_id_FK INT,
 FOREIGN KEY (transaction_store_id_FK) REFERENCES store(id) ON DELETE CASCADE
