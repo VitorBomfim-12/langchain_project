@@ -17,9 +17,9 @@ class SelectTransaction():
                 
                 if response:
 
-                    relatorio = f"Número de relatórios econtrados na loja{response["transaction_store_id_FK"]: len(response)}\n"    
+                    report = f"Número de relatórios econtrados na loja{response["transaction_store_id_FK"]: len(response)}\n"    
                     for t in response:
-                        relatorio+=(
+                        report+=(
 
                             f'ID- {t['id']}|'
                             f'valor:R${t['transaction_value']}|'
@@ -29,7 +29,7 @@ class SelectTransaction():
                             f'status: {t['transaction_status']}|\n'
 
                         )
-                        return relatorio
+                        return report
                     
                 return "Nenhum relatório encontrado."
             
