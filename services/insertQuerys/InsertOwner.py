@@ -2,7 +2,7 @@ from services.DbSetup import DataBaseCon as DBC
 from schemas.requestDTOs.OwnerDTO import OwnerDTO
 import pymysql
 
-class insertOwner:
+class InsertOwner:
 
     @staticmethod
     def insertOwner(t: OwnerDTO):
