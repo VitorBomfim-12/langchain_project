@@ -17,19 +17,19 @@ class SelectTransaction():
                 
                 if response:
 
-                    report = f"Número de relatórios econtrados na loja{response["transaction_store_id_FK"]: len(response)}\n"    
+                    report = f"Número de relatórios econtrados na loja de ID:{storeID}: {len(response)}\n"    
                     for t in response:
+                        
                         report+=(
-
                             f'ID- {t['id']}|'
                             f'valor:R${t['transaction_value']}|'
                             f'Data:   {t['transaction_date'].strftime('%d/%m/%Y %H:%M')}|'
                             f'CPF:    {t['transaction_cpf']}|'
                             f'local:  {t['transaction_location']}|'
                             f'status: {t['transaction_status']}|\n'
-
                         )
-                        return report
+                    
+                    return report
                     
                 return "Nenhum relatório encontrado."
             
