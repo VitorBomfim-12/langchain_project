@@ -5,7 +5,7 @@ import pymysql
 class ActiveStore:
 
     @staticmethod
-    def ActiveStore(storeID:id)->bool:
+    def ActiveStore(storeID:int)->bool:
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:
