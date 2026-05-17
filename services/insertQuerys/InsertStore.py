@@ -15,7 +15,8 @@ class InsertStore:
                 con.commit()
 
         except pymysql.MySQLError as e:
-            return f"Erro no banco de dados: {e}"
+            print(f"Erro :{e}")
+            return "Erro no banco de dados"
         
         finally:
                 con.close()

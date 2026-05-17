@@ -16,7 +16,8 @@ class InsertOwner:
                 con.commit()
             
         except pymysql.MySQLError as e:
-            return f"Erro ao conectar ao banco{e}"
+            print(f"Erro :{e}")
+            return "Erro no banco de dados"
         
         finally:
            con.close()

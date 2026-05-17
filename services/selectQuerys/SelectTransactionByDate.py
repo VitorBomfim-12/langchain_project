@@ -34,7 +34,7 @@ class SelectTransaction():
                 return "Nenhum relatório encontrado."
             
         except pymysql.MySQLError as e:
-            print(f"Erro técnico ocultado: {e}")
+            print(f"Erro :{e}")
             return "Erro no banco de dados"
         
         finally:

@@ -16,7 +16,8 @@ class AlterTransaction():
                 con.commit()
         
         except pymysql.MySQLError as e:
-            return f"Erro ao conectar ao banco"
+            print(f"Erro :{e}")
+            return "Erro no banco de dados"
         
         finally:
                 con.close()
