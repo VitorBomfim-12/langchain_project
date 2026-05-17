@@ -18,5 +18,4 @@ class InsertStore:
             return f"Erro no banco de dados: {e}"
         
         finally:
-            if 'con' in locals() and con.open:
                 con.close()

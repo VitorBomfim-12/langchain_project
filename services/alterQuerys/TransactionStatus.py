@@ -19,5 +19,4 @@ class AlterTransaction():
             return f"Erro ao conectar ao banco"
         
         finally:
-            if 'con' in locals() and con.open:
                 con.close()

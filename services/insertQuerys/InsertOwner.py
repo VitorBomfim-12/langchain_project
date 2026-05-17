@@ -19,5 +19,4 @@ class InsertOwner:
             return f"Erro ao conectar ao banco{e}"
         
         finally:
-            if 'con' in locals() and con.open:
-                con.close()
+           con.close()
