@@ -30,3 +30,11 @@ class ValueByCPF:
                          '''
                         return report
                 return "nenhuma compra neste CPF nas últimas 24 horas. "
+            
+        except pymysql.MySQLError as e:
+            print(f"Erro :{e}")
+            return "Erro no banco de dados"
+        
+        finally:
+            if con and con.open:
+                con.close()
