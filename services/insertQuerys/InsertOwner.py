@@ -20,4 +20,5 @@ class InsertOwner:
             return "Erro no banco de dados"
         
         finally:
-           con.close()
+            if con and con.open:
+                con.close()

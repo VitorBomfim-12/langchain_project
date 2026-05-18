@@ -22,4 +22,5 @@ class ActiveStore:
             return "Erro no banco de dados"
         
         finally:
+            if con and con.open:
                 con.close()
