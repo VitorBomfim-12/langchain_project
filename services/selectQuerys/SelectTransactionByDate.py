@@ -1,12 +1,12 @@
 from services.DbSetup import DataBaseCon as DBC
-from datetime import date
+from datetime import datetime
 import pymysql
 
 
 class SelectTransaction():
     
     @staticmethod
-    def selectTransaction(storeID:int,startDate: date,finalDate: date):
+    def selectTransaction(storeID:int,startDate: datetime,finalDate: datetime):
         try:
             
             con = DBC.db_connect()
