@@ -8,9 +8,7 @@ class InsertTransaction:
 
     @staticmethod
     def insertTransaction(t:TransactionDTO):
-        
-        if not ActiveStore(t.storeID):
-                return "Estabelecimento inativo"
+    
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:
@@ -20,9 +18,10 @@ class InsertTransaction:
                 params = (t.value,t.data,t.cpf,t.location,t.status,t.reason,t.storeID)
                 cur.execute(sql,params)
                 con.commit()
+            return "Sucesso."
         except pymysql.MySQLError as e:
             print(f"Erro :{e}")
-            return "Erro no banco de dados"
+            return "Erro no banco de dados."
         
         finally:
             if con and con.open:
