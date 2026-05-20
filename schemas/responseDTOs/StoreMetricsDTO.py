@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator, Field
-from models.RiskEnum import RiskEnum
+from first_project.models.RiskEnum import RiskEnum
 
 class StoreMetric(BaseModel):
     storeID: int

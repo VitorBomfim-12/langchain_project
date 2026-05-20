@@ -3,7 +3,7 @@ from pydantic import BaseModel,Field, field_validator
 from decimal import Decimal
 from datetime import datetime, timezone
 from validate_docbr import CPF
-from models.TransactionStatusEnum import StatusEnum
+from first_project.models.TransactionStatusEnum import StatusEnum
 
 
 class TransactionDTO(BaseModel):

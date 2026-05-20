@@ -1,16 +1,15 @@
 from fastapi import APIRouter
 from datetime import datetime
-from services.selectQuerys import ActiveStoreQuery
-from services.selectQuerys import LimitValue
-from services.insertQuerys import InsertTransaction
-from models.TransactionStatusEnum import StatusEnum
-from models.RiskEnum import RiskEnum
+from first_project.services.selectQuerys import ActiveStoreQuery
+from first_project.services.selectQuerys import LimitValue
+from first_project.services.insertQuerys import InsertTransaction
+from first_project.models.TransactionStatusEnum import StatusEnum
+from first_project.models.RiskEnum import RiskEnum
 from decimal import Decimal
 from fastapi import APIRouter, HTTPException
+from first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
 
-from schemas.requestDTOs.TransactionDTO import TransactionDTO
-
-transaction_router = APIRouter(prefix="/transaction",tags="Transaction routes")
+transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
 
 @transaction_router.post("/insert")
 async def insertTransaction(payload: TransactionDTO):
@@ -40,10 +39,8 @@ async def insertTransaction(payload: TransactionDTO):
     
     dbResponse = insertTransaction(payload)
     if dbResponse == "Erro no banco de dados":
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="O motor antifraude falhou ao salvar a operação devido a uma instabilidade no banco de dados."
-        )
+        return{'mensagem':'Erro no banco de dados.'}
+        
     
     
     

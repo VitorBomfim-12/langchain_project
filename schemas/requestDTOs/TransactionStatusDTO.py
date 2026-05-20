@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator
-from models.TransactionStatusEnum import StatusEnum
+from first_project.models.TransactionStatusEnum import StatusEnum
 
 
 class TransactionStatus(BaseModel):

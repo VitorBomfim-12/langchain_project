@@ -1,6 +1,6 @@
-from services.DbSetup import DataBaseCon as DBC
-from schemas.requestDTOs.TransactionDTO import TransactionDTO
-from services.selectQuerys.ActiveStoreQuery import ActiveStore
+from first_project.services.DbSetup import DataBaseCon as DBC
+from first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
+from first_project.services.selectQuerys.ActiveStoreQuery import ActiveStore
 
 import pymysql
 

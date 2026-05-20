@@ -1,4 +1,4 @@
-from services.DbSetup import DataBaseCon as DBC
+from first_project.services.DbSetup import DataBaseCon as DBC
 from datetime import datetime
 import pymysql
 
