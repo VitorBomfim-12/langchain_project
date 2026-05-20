@@ -4,6 +4,7 @@ from first_project.services.selectQuerys import ActiveStoreQuery
 from first_project.services.selectQuerys import LimitValue
 from first_project.services.insertQuerys import InsertTransaction
 from first_project.models.TransactionStatusEnum import StatusEnum
+from first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
 from first_project.models.RiskEnum import RiskEnum
 from decimal import Decimal
 from fastapi import APIRouter, HTTPException
@@ -34,6 +35,7 @@ async def insertTransaction(payload: TransactionDTO):
         status = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
 
+    elif StoreLocation.GetLocation(payload.storeID)
     payload.status = status
     payload.reason = message
     
