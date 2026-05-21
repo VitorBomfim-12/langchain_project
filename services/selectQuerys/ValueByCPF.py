@@ -1,8 +1,10 @@
 from first_project.services.DbSetup import DataBaseCon as DBC
+from langchain.tools import tool
 import pymysql
 
 class ValueByCPF:
 
+    @tool
     @staticmethod
     def selectValueByCPF(cpf:str):
         try:

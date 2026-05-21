@@ -4,6 +4,7 @@ from decimal import Decimal
 from datetime import datetime, timezone
 from validate_docbr import CPF
 from first_project.models.TransactionStatusEnum import StatusEnum
+from first_project.models.RiskEnum import RiskEnum
 
 
 class TransactionDTO(BaseModel):
@@ -12,6 +13,7 @@ class TransactionDTO(BaseModel):
     cpf : str = Field(strip_whitespace=True)
     location : list
     status: StatusEnum
+    risk: RiskEnum
     reason:str
     storeID: int
 

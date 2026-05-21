@@ -1,9 +1,11 @@
 from services.DbSetup import DataBaseCon as DBC
 from datetime import date
+from langchain.tools import tool
 import pymysql
 
 class ChargebackPercent:
 
+    @tool
     @staticmethod
     def selectChargebackPercent(storeID:int,initialDate:date,finalDate:date) -> str:
         try:
