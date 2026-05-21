@@ -59,24 +59,36 @@ async def insertTransaction(payload: TransactionDTO):
     systemMessage = SystemMessage(
 
         '''
+         ### Instrução ###
             Você é um agente de IA responsável por analisar transações financeiras e estabelecimentos,
         a fim de gerar relátorios que indiquem possíveis fraudes e mostre estabelecimentos suspeitos.
         nessas análises, você deve levar em consideração a localização dos estabelecimentos, valores
         médios das transações, CPF dos compradores, CPF dos donos dos estabelecimentos, intervalo de 
         tempo entre transações e indíce de chargeback dos estabelecimentos.
+
             Seu objetivo é classificar se as transações são suspeitas com base em informações detalhadas
         que lhe serão fornecidas por funções python que vão lhe fornecer relátorios, com as mais diversas
         informações sobre os estabelecimentos e as transações.
             Você tem acessos a ferramentas, com base nos status fornecidos na humanMessage, use as tools 
         identificar possíveis fraudes
+         
+            ### Exemplo de saída ###
+            status: 'PENDING','REJECTED','APPROVED'
+            risk:'LOW','MEDIUM','HIGH'
+            reason: insira aqui, a razão das decisões em risk e status, seja direto, detalhado
+            e breve
         '''
         
     )
     APImessage = HumanMessage(
 
         f'''-Detalhes da transação-\n
-        valor:{payload.value}
-        data:{payload.data}'''
+        valor:{payload.value}\n
+        data:{payload.data}\n
+        cpf:{payload.cpf}\n
+        location:{storeInfo["lat"],storeInfo["lon"]} latitude e longitude\n
+        
+        '''
     )
     dbResponse = insertTransaction(payload)
     if dbResponse == "Erro no banco de dados":

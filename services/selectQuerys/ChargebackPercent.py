@@ -8,6 +8,13 @@ class ChargebackPercent:
     @tool
     @staticmethod
     def selectChargebackPercent(storeID:int,initialDate:date,finalDate:date) -> str:
+        """Essa função retorna um relatório, com o total dos valores das transações, numero total de transações e porcentagem das
+            transações que passaram por chargeback
+            Argumentos:
+            storeID(int): representa o id do estabelecimentono banco
+            initialDate(datetime): data inicial para geração do relatório
+            finalDate(datetime): data final para geração do relatório
+            """
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:

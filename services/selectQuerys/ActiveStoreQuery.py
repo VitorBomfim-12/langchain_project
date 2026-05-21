@@ -6,6 +6,8 @@ class ActiveStore:
 
     @staticmethod
     def ActiveStore(storeID:int)->bool:
+        """Essa função retorna um resultado booleano, caso o estabelecimento
+        esteja ativo, retorna true, caso contrário, retorna false"""
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:
