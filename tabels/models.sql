@@ -9,6 +9,7 @@ cnpj VARCHAR(255) NOT NULL UNIQUE,
 mcc_code VARCHAR (20) NOT NULL,
 transaction_value_limit INT NOT NULL,
 is_active BOOL DEFAULT TRUE,
+eletronic_fence INT NOT NULL DEFAULT 10000,
 location POINT NOT NULL SRID 4326,
 SPATIAL INDEX (location)
 );

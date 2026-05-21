@@ -10,7 +10,7 @@ class TransactionDTO(BaseModel):
     value: Decimal = Field(max_digits=19, decimal_places=4)
     data : datetime
     cpf : str = Field(strip_whitespace=True)
-    location : str 
+    location : list
     status: StatusEnum
     reason:str
     storeID: int

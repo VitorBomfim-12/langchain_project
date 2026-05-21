@@ -6,6 +6,7 @@ from first_project.services.insertQuerys import InsertTransaction
 from first_project.models.TransactionStatusEnum import StatusEnum
 from first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
 from first_project.models.RiskEnum import RiskEnum
+from first_project.services.calcHaversine import calcHaversine
 from decimal import Decimal
 from fastapi import APIRouter, HTTPException
 from first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
@@ -35,7 +36,19 @@ async def insertTransaction(payload: TransactionDTO):
         status = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
 
-    elif StoreLocation.GetLocation(payload.storeID)
+    storeLatLon = StoreLocation.GetLocation(payload.storeID)
+
+    dStoreTransaction = calcHaversine(payload.location[0],
+                                      payload.location[1],
+                                      storeLatLon['lat'],
+                                      storeLatLon['lon'])
+
+    if dStoreTransaction > storeLatLon['fence_dis']:
+        message = f'Transação suspeita: cerca eletrônica violada, distância de {dStoreTransaction:.2f} metros.'
+        status = StatusEnum.PENDING
+        risk = RiskEnum.HIGH
+    
+        
     payload.status = status
     payload.reason = message
     
