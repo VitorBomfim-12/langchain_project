@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from datetime import datetime
 from first_project.services.selectQuerys import ActiveStoreQuery
 from first_project.services.selectQuerys import LimitValue
+from first_project.services.selectQuerys import ChargebackPercent
 from first_project.services.insertQuerys import InsertTransaction
 from first_project.models.TransactionStatusEnum import StatusEnum
 from first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
@@ -55,7 +56,11 @@ async def insertTransaction(payload: TransactionDTO):
     payload.risk = risk
     
     llm = init_chat_model('google_genai:gemini-2.0-flash')
-    messages: list[BaseMessage] =[]
+    messages: list[BaseMessage] =[ChargebackPercent]
+    toolsByName = {tool.name: tool for tool in tools}
+    llmWithTools = llm.bind_tools(tools)
+
+    if isinstance(llm)
     systemMessage = SystemMessage(
 
         '''
@@ -90,6 +95,7 @@ async def insertTransaction(payload: TransactionDTO):
         
         '''
     )
+    tools: list[BaseTool] = []
     dbResponse = insertTransaction(payload)
     if dbResponse == "Erro no banco de dados":
         return{'mensagem':'Erro no banco de dados.'}
