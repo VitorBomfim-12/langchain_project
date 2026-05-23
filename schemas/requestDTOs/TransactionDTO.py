@@ -3,8 +3,8 @@ from pydantic import BaseModel,Field, field_validator
 from decimal import Decimal
 from datetime import datetime, timezone
 from validate_docbr import CPF
-from first_project.models.TransactionStatusEnum import StatusEnum
-from first_project.models.RiskEnum import RiskEnum
+from src.first_project.models.TransactionStatusEnum import StatusEnum
+from src.first_project.models.RiskEnum import RiskEnum
 
 
 class TransactionDTO(BaseModel):

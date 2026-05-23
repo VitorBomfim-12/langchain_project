@@ -1,16 +1,16 @@
 from fastapi import APIRouter
 from datetime import datetime
-from first_project.services.selectQuerys import ActiveStoreQuery
-from first_project.services.selectQuerys import LimitValue
-from first_project.services.selectQuerys import ChargebackPercent
-from first_project.services.insertQuerys import InsertTransaction
-from first_project.models.TransactionStatusEnum import StatusEnum
-from first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
-from first_project.models.RiskEnum import RiskEnum
-from first_project.services.calcHaversine import calcHaversine
+from src.first_project.services.selectQuerys import ActiveStoreQuery
+from src.first_project.services.selectQuerys import LimitValue
+from src.first_project.services.selectQuerys import ChargebackPercent
+from src.first_project.services.insertQuerys import InsertTransaction
+from src.first_project.models.TransactionStatusEnum import StatusEnum
+from src.first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
+from src.first_project.models.RiskEnum import RiskEnum
+from src.first_project.services.calcHaversine import calcHaversine
 from decimal import Decimal
 from fastapi import APIRouter, HTTPException
-from first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
+from src.first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
 from langchain.chat_models import init_chat_model
 
 transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
@@ -60,7 +60,7 @@ async def insertTransaction(payload: TransactionDTO):
     toolsByName = {tool.name: tool for tool in tools}
     llmWithTools = llm.bind_tools(tools)
 
-    if isinstance(llm)
+    if isinstance(llm):
     systemMessage = SystemMessage(
 
         '''

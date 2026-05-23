@@ -1,6 +1,6 @@
-from first_project.services.DbSetup import DataBaseCon as DBC
-from first_project.schemas.requestDTOs import StoreAndOwnersDTO
-from first_project.services.selectQuerys.ActiveStoreQuery import ActiveStore
+from src.first_project.services.DbSetup import DataBaseCon as DBC
+from src.first_project.schemas.requestDTOs import StoreAndOwnersDTO
+from src.first_project.services.selectQuerys.ActiveStoreQuery import ActiveStore
 import pymysql
 
 class InsertStoreAndOwners:

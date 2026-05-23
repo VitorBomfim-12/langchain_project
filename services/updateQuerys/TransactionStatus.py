@@ -1,5 +1,5 @@
-from first_project.services.DbSetup import DataBaseCon as DBC
-from first_project.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
+from src.first_project.services.DbSetup import DataBaseCon as DBC
+from src.first_project.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 import pymysql
 
 class AlterTransaction():

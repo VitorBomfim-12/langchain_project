@@ -1,4 +1,4 @@
-from first_project.services.DbSetup import DataBaseCon as DBC
+from src.first_project.services.DbSetup import DataBaseCon as DBC
 from langchain.tools import tool
 import pymysql
 
