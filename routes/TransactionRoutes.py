@@ -88,23 +88,19 @@ def insertTransaction(payload: TransactionDTO):
         status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
-    
-
     payload.reason = message  
     payload.status = status
     payload.risk = risk
     
     if payload.status == 'PENDING' or payload.risk == 'HIGH':
-     
-    
-        
+         
         transactionContext =  f'''-Detalhes da transação-\n
             valor:{payload.value}\n
             data:{payload.data}\n
             cpf:{payload.cpf}\n
             location:{storeInfo["lat"],storeInfo["lon"]} latitude e longitude\n
-            storeID:{payload.storeID}
-            
+            storeID:{payload.storeID}\n
+            razão dos status:{payload.reason}
             '''
         try: 
             response = caronte_chain.invoke({'input':transactionContext})
@@ -112,13 +108,20 @@ def insertTransaction(payload: TransactionDTO):
             payload.reason =  response.reason
             payload.status = response.status
             payload.risk = response.risk
+
         except Exception as e:
-            pass
+
+            payload.reason =f'O agente não foi capaz de analisar a transação, erro:{e}'
+            payload.status = StatusEnum.PENDING
+            payload.risk = RiskEnum.HIGH
 
 
     dbResponse = IT(payload)
     if dbResponse == "Erro no banco de dados":
-        return{'mensagem':'Erro no banco de dados.'}
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='falha no banco de dados'
+        )
         
     
     
