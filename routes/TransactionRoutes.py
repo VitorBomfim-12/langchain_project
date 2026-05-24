@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from datetime import datetime
 from src.first_project.services.selectQuerys import ActiveStoreQuery
-from src.first_project.services.selectQuerys import LimitValue
+from first_project.services.selectQuerys import SelectLimitValue
 from src.first_project.services.selectQuerys import ChargebackPercent
 from src.first_project.services.insertQuerys import InsertTransaction as IT
 from src.first_project.models.TransactionStatusEnum import StatusEnum
@@ -21,25 +21,34 @@ transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes']
 @transaction_router.post("/insert")
 async def insertTransaction(payload: TransactionDTO):
 
+    payload.reason = 'NULL' 
+    payload.status = 'APROVED'
+    payload.risk = 'LOW'
+
     if not ActiveStoreQuery.ActiveStore(payload.storeID):
         message = 'Estabelecimento inativo.'
         status = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
-    elif (payload.value>LimitValue.StoreLimitQuery.storeLimit(payload.storeID)):
+    elif (payload.value>SelectLimitValue.StoreLimitQuery.storeLimit(payload.storeID)):
         message = ' Limite do estabelecimento excedido.'
         status = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
     elif 6 > datetime.now().hour > 23 and payload.value> Decimal('200.00'):
         message = 'Limite noturno excedido.'
-        status = StatusEnum.REJECTED
+        status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif payload.value <= Decimal('2.00'):
         message = 'Transação suspeita: valor abaixo do piso mínimo de segurança.'
         status = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
+
+    elif dStoreTransaction > storeInfo['fence_dis']:
+        message = f'Transação suspeita: cerca eletrônica violada, distância de {dStoreTransaction:.2f} metros.'
+        status = StatusEnum.PENDING
+        risk = RiskEnum.HIGH
 
     storeInfo = StoreLocation.GetLocation(payload.storeID)
 
@@ -48,17 +57,13 @@ async def insertTransaction(payload: TransactionDTO):
                                       storeInfo['lat'],
                                       storeInfo['lon'])
 
-    if dStoreTransaction > storeInfo['fence_dis']:
-        message = f'Transação suspeita: cerca eletrônica violada, distância de {dStoreTransaction:.2f} metros.'
-        status = StatusEnum.PENDING
-        risk = RiskEnum.HIGH
-    
+
     payload.reason = message  
     payload.status = status
     payload.risk = risk
     
     if payload.status == 'PENDING' or payload.risk == 'HIGH':
-        llm = init_chat_model('google_genai:gemini-2.0-flash')
+        llm = init_chat_model('google_genai:gemini-1.5-flash')
         tools: list[BaseTool] =[ChargebackPercent]
         toolsByName = {tool.name: tool for tool in tools}
         llmWithTools = llm.bind_tools(tools)
@@ -77,8 +82,8 @@ async def insertTransaction(payload: TransactionDTO):
                 Seu objetivo é classificar se as transações são suspeitas com base em informações detalhadas
             que lhe serão fornecidas por funções python que vão lhe fornecer relátorios, com as mais diversas
             informações sobre os estabelecimentos e as transações.
-                Você tem acessos a ferramentas, com base nos status fornecidos na humanMessage, use as tools 
-            identificar possíveis fraudes
+                Você tem acessos a ferramentas, com base nos status fornecidos na humanMessage, use as tools para
+            identificar possíveis fraudes.
              
                 ### Exemplo de saída ###
                 ## Faça um JSON puro, contendo estes itens e suas chaves ##
@@ -100,6 +105,7 @@ async def insertTransaction(payload: TransactionDTO):
             data:{payload.data}\n
             cpf:{payload.cpf}\n
             location:{storeInfo["lat"],storeInfo["lon"]} latitude e longitude\n
+            storeID:{payload.storeID}
             
             '''
         )
@@ -117,6 +123,7 @@ async def insertTransaction(payload: TransactionDTO):
                 content = f'Corrija este erro:{e}'
             
             toolMessage= ToolMessage(content=content)
+        
 
     dbResponse = IT(payload)
     if dbResponse == "Erro no banco de dados":
