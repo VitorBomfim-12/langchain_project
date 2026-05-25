@@ -1,31 +1,36 @@
 from fastapi import APIRouter
 from datetime import datetime
-from src.first_project.services.selectQuerys import ActiveStoreQuery
-from first_project.services.selectQuerys import SelectLimitValue
-from src.first_project.services.selectQuerys import ChargebackPercent
-from src.first_project.services.insertQuerys import InsertTransaction as IT
-from src.first_project.models.TransactionStatusEnum import StatusEnum
-from src.first_project.services.selectQuerys.SelectStoreLocation import StoreLocation
-from src.first_project.models.RiskEnum import RiskEnum
-from src.first_project.services.calcHaversine import calcHaversine
-from src.first_project.schemas.agentsResponseSchemas.transactionSchema import AgentResponse
+from services.selectQuerys.ActiveStoreQuery import ActiveStore
+from services.selectQuerys.SelectLimitValue import StoreLimitQuery
+from services.selectQuerys.ChargebackPercent import selectChargebackPercent
+from services.insertQuerys.InsertTransaction import InsertTransaction as it
+from models.TransactionStatusEnum import StatusEnum
+from services.selectQuerys.SelectStoreLocation import StoreLocation
+from models.RiskEnum import RiskEnum
+from services.calcHaversine import calcHaversine
+from schemas.agentsResponseSchemas.transactionSchema import AgentResponse
 from pydantic import ValidationError
 from decimal import Decimal
 from fastapi import APIRouter, HTTPException
-from src.first_project.schemas.requestDTOs.TransactionDTO import TransactionDTO
+from schemas.requestDTOs.TransactionDTO import TransactionDTO
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage, ToolMessage
 from langchain_core.tools import BaseTool
 
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_classic.agents import AgentExecutor
+from langchain_classic.agents import create_tool_calling_agent
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
+import os
 
-transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
+llm = init_chat_modelllm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"), # Puxa do seu .env
+    temperature=0
+)
 
-llm = init_chat_model('google_genai:gemini-1.5-flash')
-
-tools = [ChargebackPercent] 
+tools = [selectChargebackPercent] 
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", ''' ### Instrução ###
@@ -50,20 +55,21 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 llm_formatador = llm.with_structured_output(AgentResponse, method="json_mode")
 
 caronte_chain = agent_executor | (lambda x: f"Com base nesta investigação: {x['output']}. Formate o veredito final.") | llm_formatador
+transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
+@transaction_router.post("/insert")
+
 def insertTransaction(payload: TransactionDTO):
+    print("TESTEEEEE")
+    print(payload)
 
-    payload.reason = 'Null'
-    payload.status = StatusEnum.APPROVED
-    payload.risk = RiskEnum.LOW
-
-    if not ActiveStoreQuery.ActiveStore(payload.storeID):
+    if not ActiveStore(payload.storeID):
         message = 'Estabelecimento inativo.'
         status = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
-    elif (payload.value>SelectLimitValue.StoreLimitQuery.storeLimit(payload.storeID)):
-        message = ' Limite do estabelecimento excedido.'
-        status = StatusEnum.REJECTED
+    elif payload.value>StoreLimitQuery.storeLimit(payload.storeID):
+        message = 'Limite do estabelecimento excedido.'
+        status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif (datetime.now().hour > 23 or datetime.now().hour < 6) and payload.value> Decimal('200.00'):
@@ -72,12 +78,12 @@ def insertTransaction(payload: TransactionDTO):
         risk = RiskEnum.HIGH
 
     elif payload.value <= Decimal('2.00'):
-        message = 'Transação suspeita: valor abaixo do piso mínimo de segurança.'
+        message = 'Transação suspeita: valor jabaixo do piso mínimo de segurança.'
         status = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
 
     storeInfo = StoreLocation.GetLocation(payload.storeID)
-
+    
     dStoreTransaction = calcHaversine(payload.location[0],
                                       payload.location[1],
                                       storeInfo['lat'],
@@ -116,12 +122,10 @@ def insertTransaction(payload: TransactionDTO):
             payload.risk = RiskEnum.HIGH
 
 
-    dbResponse = IT(payload)
-    if dbResponse == "Erro no banco de dados":
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='falha no banco de dados'
-        )
+    response =it.insertTransaction(payload)
+    if response != 'Sucesso.':
+        return {'status':'erro'}
+    return {'status':'Sucesso.'}
         
     
     

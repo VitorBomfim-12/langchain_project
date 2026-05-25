@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from validate_docbr import CPF
-from src.first_project.models.RiskEnum import RiskEnum
+from models.RiskEnum import RiskEnum
 
 class BlacklistDTO(BaseModel):
     identifierCPF:str = Field(strip_whitespace=True)

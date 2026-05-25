@@ -7,9 +7,9 @@ id INT PRIMARY KEY AUTO_INCREMENT,
 store_name VARCHAR(255) NOT NULL UNIQUE,
 cnpj VARCHAR(255) NOT NULL UNIQUE,
 mcc_code VARCHAR (20) NOT NULL,
-transaction_value_limit INT NOT NULL,
+transaction_value_limit DECIMAL(19, 4),
 is_active BOOL DEFAULT TRUE,
-eletronic_fence INT NOT NULL DEFAULT 10000,
+eletronic_fence DECIMAL(8, 2) NOT NULL DEFAULT 500.00,
 location POINT NOT NULL SRID 4326,
 SPATIAL INDEX (location)
 );

@@ -1,4 +1,4 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 import pymysql
 
 
@@ -23,7 +23,4 @@ class StoreLocation:
         except pymysql.MySQLError as e:
             print(f"Erro :{e}")
             return "Erro no banco de dados"
-        
-        finally:
-            if con and con.open:
-                con.close()
+       

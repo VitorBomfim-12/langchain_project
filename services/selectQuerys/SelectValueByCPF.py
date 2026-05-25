@@ -1,4 +1,4 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 from langchain.tools import tool
 import pymysql
 
@@ -37,6 +37,4 @@ class ValueByCPF:
             print(f"Erro :{e}")
             return "Erro no banco de dados"
         
-        finally:
-            if con and con.open:
-                con.close()
+       

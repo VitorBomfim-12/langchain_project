@@ -1,5 +1,5 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
-from src.first_project.schemas.requestDTOs.OwnerDTO import OwnerDTO
+from services.DbSetup import DataBaseCon as DBC
+from schemas.requestDTOs.OwnerDTO import OwnerDTO
 import pymysql
 
 class InsertOwner:
