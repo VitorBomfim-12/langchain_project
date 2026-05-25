@@ -25,8 +25,8 @@ from langchain.chat_models import init_chat_model
 import os
 
 llm = init_chat_modelllm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY"), # Puxa do seu .env
+    model="gemini-2.5-flash-lite",
+    google_api_key=os.getenv("GOOGLE_API_KEY"), 
     temperature=0
 )
 
@@ -52,7 +52,7 @@ prompt = ChatPromptTemplate.from_messages([
 agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-llm_formatador = llm.with_structured_output(AgentResponse, method="json_mode")
+llm_formatador = llm.with_structured_output(AgentResponse)
 
 caronte_chain = agent_executor | (lambda x: f"Com base nesta investigação: {x['output']}. Formate o veredito final.") | llm_formatador
 transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
@@ -114,13 +114,15 @@ def insertTransaction(payload: TransactionDTO):
             payload.reason =  response.reason
             payload.status = response.status
             payload.risk = response.risk
-
+            
         except Exception as e:
 
             payload.reason =f'O agente não foi capaz de analisar a transação, erro:{e}'
             payload.status = StatusEnum.PENDING
             payload.risk = RiskEnum.HIGH
+            print(e)
 
+    print (payload)
 
     response =it.insertTransaction(payload)
     if response != 'Sucesso.':
