@@ -3,6 +3,7 @@ from datetime import datetime
 from services.selectQuerys.ActiveStoreQuery import ActiveStore
 from services.selectQuerys.SelectLimitValue import StoreLimitQuery
 from services.selectQuerys.ChargebackPercent import selectChargebackPercent
+from services.selectQuerys.SelectValueByCPF import selectValueByCPF
 from services.insertQuerys.InsertTransaction import InsertTransaction as it
 from models.TransactionStatusEnum import StatusEnum
 from services.selectQuerys.SelectStoreLocation import StoreLocation
@@ -30,7 +31,7 @@ llm = init_chat_modelllm = ChatGoogleGenerativeAI(
     temperature=0
 )
 
-tools = [selectChargebackPercent] 
+tools = [selectChargebackPercent,selectValueByCPF] 
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", ''' ### Instrução ###
@@ -43,8 +44,12 @@ prompt = ChatPromptTemplate.from_messages([
                 Seu objetivo é classificar se as transações são suspeitas com base em informações detalhadas
             que lhe serão fornecidas por funções python que vão lhe fornecer relátorios, com as mais diversas
             informações sobre os estabelecimentos e as transações.
-                Você tem acessos a ferramentas, com base nos status fornecidos na humanMessage, use as tools para
-            identificar possíveis fraudes.'''),
+     
+                Analise fatores como: volume de transações na loja,volume de compras num CPF, valores, distâncias
+            e horários.
+     
+                Use obrigatoriamente algumas das Tools que você tem acesso, lendo a documentação de cada uma,
+     para no final, tomar uma decisão quanto a definir os status da transação.'''),
     ("human", "{input}"),
     ("placeholder", "{agent_scratchpad}"), 
 ])
@@ -61,24 +66,24 @@ transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes']
 def insertTransaction(payload: TransactionDTO):
     print("TESTEEEEE")
     print(payload)
-
+    message = ''
     if not ActiveStore(payload.storeID):
-        message = 'Estabelecimento inativo.'
+        message += '\n Estabelecimento inativo.'
         status = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
     elif payload.value>StoreLimitQuery.storeLimit(payload.storeID):
-        message = 'Limite do estabelecimento excedido.'
+        message += '\n Limite do estabelecimento excedido.'
         status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif (datetime.now().hour > 23 or datetime.now().hour < 6) and payload.value> Decimal('200.00'):
-        message = 'Limite noturno excedido.'
+        message += '\n Limite noturno excedido.'
         status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif payload.value <= Decimal('2.00'):
-        message = 'Transação suspeita: valor jabaixo do piso mínimo de segurança.'
+        message += '\n Transação suspeita: valor jabaixo do piso mínimo de segurança.'
         status = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
 
@@ -90,7 +95,10 @@ def insertTransaction(payload: TransactionDTO):
                                       storeInfo['lon'])
 
     if dStoreTransaction > storeInfo['fence_dis']:
-        message = f'Transação suspeita: cerca eletrônica violada, distância de {dStoreTransaction:.2f} metros.'
+        message = f'''Transação suspeita: cerca eletrônica violada,
+        a compra foi feita a distância de {dStoreTransaction:.2f} metros do local da sede
+        do estabelecimento
+        '''
         status = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
