@@ -1,5 +1,5 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
-from src.first_project.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
+from services.DbSetup import DataBaseCon as DBC
+from schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 import pymysql
 
 class AlterTransaction():
@@ -14,7 +14,10 @@ class AlterTransaction():
                 params = (t.status,t.reason,t.transactionID)
                 cur.execute (sql,params)
                 con.commit()
-        
+
+                if cur.rowcount == 0:
+                    return False
+                return True        
         except pymysql.MySQLError as e:
             print(f"Erro :{e}")
             return "Erro no banco de dados"

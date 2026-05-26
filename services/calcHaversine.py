@@ -1,6 +1,11 @@
 import math
 def calcHaversine(lat1,lon1,lat2,lon2):
     r=6372.8
+    lat1= float(lat1)
+    lat2= float(lat2)
+    lon1= float(lon1)
+    lon2= float(lon2)
+    
     dlat = (lat2-lat1)
     dlon = (lon2-lon1)
 

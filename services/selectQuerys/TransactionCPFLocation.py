@@ -1,4 +1,4 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 import datetime
 import pymysql
 
@@ -42,6 +42,4 @@ class TransactionCPFLocation:
             print(f"Erro :{e}")
             return "Erro no banco de dados"
         
-        finally:
-            if con and con.open:
-                con.close()
+      

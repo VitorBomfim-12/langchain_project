@@ -1,4 +1,4 @@
-from src.first_project.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 import pymysql
 from src.first_project.schemas.requestDTOs.StoreDTO import StoreDTO
 
