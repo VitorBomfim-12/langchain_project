@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException,status
 from datetime import datetime
 from services.selectQuerys.ActiveStoreQuery import ActiveStore
 from services.selectQuerys.SelectLimitValue import StoreLimitQuery
@@ -10,20 +10,17 @@ from services.selectQuerys.SelectStoreLocation import StoreLocation
 from models.RiskEnum import RiskEnum
 from services.calcHaversine import calcHaversine
 from schemas.agentsResponseSchemas.transactionSchema import AgentResponse
-from pydantic import ValidationError
 from decimal import Decimal
-from fastapi import APIRouter, HTTPException
 from schemas.requestDTOs.TransactionDTO import TransactionDTO
-from langchain.chat_models import init_chat_model
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage, ToolMessage
-from langchain_core.tools import BaseTool
-
 from langchain_classic.agents import AgentExecutor
 from langchain_classic.agents import create_tool_calling_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chat_models import init_chat_model
+
 import os
+
+from services.updateQuerys.TransactionStatus import AlterTransaction
+from schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 
 llm = init_chat_modelllm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash-lite",
@@ -61,11 +58,10 @@ llm_formatador = llm.with_structured_output(AgentResponse)
 
 caronte_chain = agent_executor | (lambda x: f"Com base nesta investigação: {x['output']}. Formate o veredito final.") | llm_formatador
 transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
-@transaction_router.post("/insert")
 
+@transaction_router.post("/insert")
 def insertTransaction(payload: TransactionDTO):
-    print("TESTEEEEE")
-    print(payload)
+    
     message = ''
     if not ActiveStore(payload.storeID):
         message += '\n Estabelecimento inativo.'
@@ -95,7 +91,7 @@ def insertTransaction(payload: TransactionDTO):
                                       storeInfo['lon'])
 
     if dStoreTransaction > storeInfo['fence_dis']:
-        message = f'''Transação suspeita: cerca eletrônica violada,
+        message += f'''Transação suspeita: cerca eletrônica violada,
         a compra foi feita a distância de {dStoreTransaction:.2f} metros do local da sede
         do estabelecimento
         '''
@@ -130,13 +126,38 @@ def insertTransaction(payload: TransactionDTO):
             payload.risk = RiskEnum.HIGH
             print(e)
 
-    print (payload)
-
     response =it.insertTransaction(payload)
-    if response != 'Sucesso.':
-        return {'status':'erro'}
-    return {'status':'Sucesso.'}
+    if response == 'Sucesso.':
+         return {'status':'Sucesso.'}
+    
+    elif response == 'Erro no banco de dados.':
+            raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail= f"Erro interno ao acessar o banco de dados: {str(e)}"
+                          
+        )
+   
         
+@transaction_router.patch("/update-status")
+def alterTransactionStatus(payload : TransactionStatus):
     
-    
-    
+    try:
+        success = AlterTransaction.alterTransaction(payload)
+        
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Transação com o ID {payload.transaction_id} não foi encontrada no sistema."
+            )
+            
+        return {"status": "Sucesso.", 
+                "message": "Status atualizado com sucesso."}
+
+    except HTTPException as http_err:
+        raise http_err
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail= f"Erro interno ao acessar o banco de dados: {str(e)}"
+                            )
