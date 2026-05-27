@@ -17,7 +17,7 @@ class InsertOwner:
             
         except pymysql.MySQLError as e:
             print(f"Erro :{e}")
-            return "Erro no banco de dados"
+            return "Erro no banco de dados."
         
         finally:
             if con and con.open:

@@ -153,9 +153,6 @@ def alterTransactionStatus(payload : TransactionStatus):
         return {"status": "Sucesso.", 
                 "message": "Status atualizado com sucesso."}
 
-    except HTTPException as http_err:
-        raise http_err
-        
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
