@@ -19,7 +19,7 @@ class OwnerDTO(BaseModel):
     
     @field_validator("birthday")
     @classmethod
-    def validate_cnpj(cls,v:date)->date:
+    def validate_birthday(cls,v:date)->date:
         if v > datetime.now(): raise ValueError("Idade inválida.")
         if v - relativedelta(year=18) < relativedelta(18):raise ValueError('''Pessoas com idade menor 
         que 18 não podem ser cadastras como propietárias.''')

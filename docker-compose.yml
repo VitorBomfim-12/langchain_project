@@ -1,0 +1,18 @@
+
+
+services:
+  caronte-api:
+    build: .
+    container_name: caronte_ai_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
+      - DB_HOST=172.17.0.1
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    restart: always

@@ -8,7 +8,8 @@ class DataBaseCon:
     
     @staticmethod
     def db_connect():
-       connection = pymysql.connect(host='localhost',
+       host_db = os.getenv("DB_HOST", "localhost")
+       connection = pymysql.connect(host=host_db,
                                  user='root',
                                  password=os.getenv("DB_PASSWORD"),
                                  database='financial_data',

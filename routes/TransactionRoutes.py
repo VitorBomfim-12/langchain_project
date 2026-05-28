@@ -65,22 +65,22 @@ def insertTransaction(payload: TransactionDTO):
     message = ''
     if not ActiveStore(payload.storeID):
         message += '\n Estabelecimento inativo.'
-        status = StatusEnum.REJECTED
+        statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
     elif payload.value>StoreLimitQuery.storeLimit(payload.storeID):
         message += '\n Limite do estabelecimento excedido.'
-        status = StatusEnum.PENDING
+        statusTransaction = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif (datetime.now().hour > 23 or datetime.now().hour < 6) and payload.value> Decimal('200.00'):
         message += '\n Limite noturno excedido.'
-        status = StatusEnum.PENDING
+        statusTransaction = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     elif payload.value <= Decimal('2.00'):
         message += '\n Transação suspeita: valor jabaixo do piso mínimo de segurança.'
-        status = StatusEnum.PENDING
+        statusTransaction = StatusEnum.PENDING
         risk = RiskEnum.MEDIUM
 
     storeInfo = StoreLocation.GetLocation(payload.storeID)
@@ -95,11 +95,11 @@ def insertTransaction(payload: TransactionDTO):
         a compra foi feita a distância de {dStoreTransaction:.2f} metros do local da sede
         do estabelecimento
         '''
-        status = StatusEnum.PENDING
+        statusTransaction = StatusEnum.PENDING
         risk = RiskEnum.HIGH
 
     payload.reason = message  
-    payload.status = status
+    payload.status = statusTransaction
     payload.risk = risk
     
     if payload.status == 'PENDING' or payload.risk == 'HIGH':
@@ -110,7 +110,8 @@ def insertTransaction(payload: TransactionDTO):
             cpf:{payload.cpf}\n
             location:{storeInfo["lat"],storeInfo["lon"]} latitude e longitude\n
             storeID:{payload.storeID}\n
-            razão dos status:{payload.reason}
+            razão dos status:{payload.reason}\n
+            Alertas gerados:{message}\n
             '''
         try: 
             response = caronte_chain.invoke({'input':transactionContext})

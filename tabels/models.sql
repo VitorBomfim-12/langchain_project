@@ -5,6 +5,7 @@ USE financial_data;
 CREATE TABLE IF NOT EXISTS store(
 id INT PRIMARY KEY AUTO_INCREMENT,
 store_name VARCHAR(255) NOT NULL UNIQUE,
+store_type VARCHAR(100) NOT NULL UNIQUE,
 cnpj VARCHAR(255) NOT NULL UNIQUE,
 mcc_code VARCHAR (20) NOT NULL,
 transaction_value_limit DECIMAL(19, 4),
