@@ -1,5 +1,7 @@
 orientações
 orientações.txt
+venv
+.venv
 .env
 .venv/
 __pycache__/
