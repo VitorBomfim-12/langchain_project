@@ -1,4 +1,4 @@
-from src.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 import pymysql
 
 class StoreByCPF:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter,HTTPException,status
-from src.schemas.requestDTOs.OwnerDTO import OwnerDTO
-from src.services.insertQuerys.InsertOwner import insertOwner
+from schemas.requestDTOs.OwnerDTO import OwnerDTO
+from services.insertQuerys.InsertOwner import insertOwner
 
 store_and_owner_router = APIRouter(prefix="/store-owner",tags=["store and owners"])
 

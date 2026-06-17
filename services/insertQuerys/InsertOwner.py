@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from src.services.DbSetup import DataBaseCon as DBC
-from src.schemas.requestDTOs.OwnerDTO import OwnerDTO
+from services.DbSetup import DataBaseCon as DBC
+from schemas.requestDTOs.OwnerDTO import OwnerDTO
 import pymysql
 
 

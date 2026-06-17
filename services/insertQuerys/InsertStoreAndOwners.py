@@ -1,6 +1,6 @@
-from src.services.DbSetup import DataBaseCon as DBC
-from src.schemas.requestDTOs import StoreAndOwnersDTO
-from src.services.selectQuerys.ActiveStoreQuery import ActiveStore
+from services.DbSetup import DataBaseCon as DBC
+from schemas.requestDTOs import StoreAndOwnersDTO
+from services.selectQuerys.ActiveStoreQuery import ActiveStore
 import pymysql
 
 class InsertStoreAndOwners:

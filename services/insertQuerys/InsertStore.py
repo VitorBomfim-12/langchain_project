@@ -1,6 +1,6 @@
-from src.services.DbSetup import DataBaseCon as DBC
+from services.DbSetup import DataBaseCon as DBC
 import pymysql
-from src.schemas.requestDTOs.StoreDTO import StoreDTO
+from schemas.requestDTOs.StoreDTO import StoreDTO
 
 class InsertStore:
     @staticmethod

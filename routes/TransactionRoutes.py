@@ -1,17 +1,17 @@
 from fastapi import APIRouter,HTTPException,status
 from datetime import datetime
-from src.services.selectQuerys.ActiveStoreQuery import ActiveStore
-from src.services.selectQuerys.SelectLimitValue import StoreLimitQuery
-from src.services.selectQuerys.ChargebackPercent import selectChargebackPercent
-from src.services.selectQuerys.SelectValueByCPF import selectValueByCPF
-from src.services.insertQuerys.InsertTransaction import InsertTransaction as it
-from src.models.TransactionStatusEnum import StatusEnum
-from src.services.selectQuerys.SelectStoreLocation import StoreLocation
-from src.models.RiskEnum import RiskEnum
-from src.services.calcHaversine import calcHaversine
-from src.schemas.agentsResponseSchemas.transactionSchema import AgentResponse
+from services.selectQuerys.ActiveStoreQuery import ActiveStore
+from services.selectQuerys.SelectLimitValue import StoreLimitQuery
+from services.selectQuerys.ChargebackPercent import selectChargebackPercent
+from services.selectQuerys.SelectValueByCPF import selectValueByCPF
+from services.insertQuerys.InsertTransaction import InsertTransaction as it
+from models.TransactionStatusEnum import StatusEnum
+from services.selectQuerys.SelectStoreLocation import StoreLocation
+from models.RiskEnum import RiskEnum
+from services.calcHaversine import calcHaversine
+from schemas.agentsResponseSchemas.transactionSchema import AgentResponse
 from decimal import Decimal
-from src.schemas.requestDTOs.TransactionDTO import TransactionDTO
+from schemas.requestDTOs.TransactionDTO import TransactionDTO
 from langchain_classic.agents import AgentExecutor
 from langchain_classic.agents import create_tool_calling_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -19,8 +19,8 @@ from langchain_core.prompts import ChatPromptTemplate
 
 import os
 
-from src.services.updateQuerys.TransactionStatus import AlterTransaction
-from src.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
+from services.updateQuerys.TransactionStatus import AlterTransaction
+from schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 
 llm = init_chat_modelllm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash-lite",
@@ -29,34 +29,6 @@ llm = init_chat_modelllm = ChatGoogleGenerativeAI(
 )
 
 tools = [selectChargebackPercent,selectValueByCPF] 
-
-prompt = ChatPromptTemplate.from_messages([
-    ("system", ''' ### Instrução ###
-                Você é um agente de IA responsável por analisar transações financeiras e estabelecimentos,
-            a fim de gerar relátorios que indiquem possíveis fraudes e mostre estabelecimentos suspeitos.
-            nessas análises, você deve levar em consideração a localização dos estabelecimentos, valores
-            médios das transações, CPF dos compradores, CPF dos donos dos estabelecimentos, intervalo de 
-            tempo entre transações e indíce de chargeback dos estabelecimentos.
-    
-                Seu objetivo é classificar se as transações são suspeitas com base em informações detalhadas
-            que lhe serão fornecidas por funções python que vão lhe fornecer relátorios, com as mais diversas
-            informações sobre os estabelecimentos e as transações.
-     
-                Analise fatores como: volume de transações na loja,volume de compras num CPF, valores, distâncias
-            e horários.
-     
-                Use obrigatoriamente algumas das Tools que você tem acesso, lendo a documentação de cada uma,
-     para no final, tomar uma decisão quanto a definir os status da transação.'''),
-    ("human", "{input}"),
-    ("placeholder", "{agent_scratchpad}"), 
-])
-
-agent = create_tool_calling_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-llm_formatador = llm.with_structured_output(AgentResponse)
-
-caronte_chain = agent_executor | (lambda x: f"Com base nesta investigação: {x['output']}. Formate o veredito final.") | llm_formatador
 transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
 
 @transaction_router.post("/insert")

@@ -2,8 +2,8 @@ import pydantic,re
 from pydantic import BaseModel,Field, field_validator
 from decimal import Decimal
 from datetime import datetime, timezone
-from src.models.TransactionStatusEnum import StatusEnum
-from src.models.RiskEnum import RiskEnum
+from models.TransactionStatusEnum import StatusEnum
+from models.RiskEnum import RiskEnum
 
 
 class TransactionDTO(BaseModel):
