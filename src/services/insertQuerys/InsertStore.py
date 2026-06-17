@@ -1,6 +1,6 @@
-from services.DbSetup import DataBaseCon as DBC
+from langchain_project.src.services.DbSetup import DataBaseCon as DBC
 import pymysql
-from schemas.requestDTOs.StoreDTO import StoreDTO
+from langchain_project.src.schemas.requestDTOs.StoreDTO import StoreDTO
 
 class InsertStore:
     @staticmethod

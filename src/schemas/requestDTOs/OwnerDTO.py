@@ -1,6 +1,6 @@
 from pydantic import BaseModel, field_validator, Field
 from datetime import date,datetime
-from services.ageVerify import isOver18 
+from langchain_project.src.services.ageVerify import isOver18 
 class OwnerDTO(BaseModel):
     name:str = Field(description="Nome do propietário",strip_whitespace=True)
     cpf:str = Field(description="CPF do propietário",strip_whitespace=True)

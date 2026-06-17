@@ -1,6 +1,6 @@
 from fastapi import APIRouter,HTTPException,status
-from schemas.requestDTOs.OwnerDTO import OwnerDTO
-from services.insertQuerys.InsertOwner import insertOwner
+from langchain_project.src.schemas.requestDTOs.OwnerDTO import OwnerDTO
+from langchain_project.src.services.insertQuerys.InsertOwner import insertOwner
 
 store_and_owner_router = APIRouter(prefix="/store-owner",tags=["store and owners"])
 

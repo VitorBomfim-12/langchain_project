@@ -1,17 +1,17 @@
 from fastapi import APIRouter,HTTPException,status
 from datetime import datetime
-from services.selectQuerys.ActiveStoreQuery import ActiveStore
-from services.selectQuerys.SelectLimitValue import StoreLimitQuery
-from services.selectQuerys.ChargebackPercent import selectChargebackPercent
-from services.selectQuerys.SelectValueByCPF import selectValueByCPF
-from services.insertQuerys.InsertTransaction import InsertTransaction as it
-from models.TransactionStatusEnum import StatusEnum
-from services.selectQuerys.SelectStoreLocation import StoreLocation
-from models.RiskEnum import RiskEnum
-from services.calcHaversine import calcHaversine
-from schemas.agentsResponseSchemas.transactionSchema import AgentResponse
+from langchain_project.src.services.selectQuerys.ActiveStoreQuery import ActiveStore
+from langchain_project.src.services.selectQuerys.SelectLimitValue import StoreLimitQuery
+from langchain_project.src.services.selectQuerys.ChargebackPercent import selectChargebackPercent
+from langchain_project.src.services.selectQuerys.SelectValueByCPF import selectValueByCPF
+from langchain_project.src.services.insertQuerys.InsertTransaction import InsertTransaction as it
+from langchain_project.src.models.TransactionStatusEnum import StatusEnum
+from langchain_project.src.services.selectQuerys.SelectStoreLocation import StoreLocation
+from langchain_project.src.models.RiskEnum import RiskEnum
+from langchain_project.src.services.calcHaversine import calcHaversine
+from langchain_project.src.schemas.agentsResponseSchemas.transactionSchema import AgentResponse
 from decimal import Decimal
-from schemas.requestDTOs.TransactionDTO import TransactionDTO
+from langchain_project.src.schemas.requestDTOs.TransactionDTO import TransactionDTO
 from langchain_classic.agents import AgentExecutor
 from langchain_classic.agents import create_tool_calling_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -19,8 +19,8 @@ from langchain_core.prompts import ChatPromptTemplate
 
 import os
 
-from services.updateQuerys.TransactionStatus import AlterTransaction
-from schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
+from langchain_project.src.services.updateQuerys.TransactionStatus import AlterTransaction
+from langchain_project.src.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 
 llm = init_chat_modelllm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash-lite",
