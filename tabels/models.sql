@@ -60,5 +60,8 @@ store_id INT PRIMARY KEY,
 total_chargebacks INT DEFAULT 0, 
 average_transaction_value DECIMAL(19, 4),   
 risk_level ENUM('LOW', 'MEDIUM', 'HIGH') DEFAULT 'LOW',
+store_points INT,
+reason TEXT,
 FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
 );
+

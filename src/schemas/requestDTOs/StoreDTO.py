@@ -1,6 +1,5 @@
 import pydantic,re
 from pydantic import BaseModel,field_validator,Field
-from validate_docbr import CNPJ
 
 
 class StoreDTO(BaseModel):
@@ -8,17 +7,3 @@ class StoreDTO(BaseModel):
     cnpj:str = Field(strip_whitespace=True)
     mccCode:str = Field(strip_whitespace=True)
     location:str 
-
-    @field_validator('cnpj')
-    @classmethod
-    def validate_cnpj(cls,v:str)->str:
-        validator = CNPJ()
-
-        if not validator.validate(v):
-            raise ValueError("CNJP inválido")
-        return v
-    
-    @field_validator('cpnj')
-    @classmethod
-    def clean_cnpj(cls,v:str)->str:
-        return re.sub(r'\D', '', v)
