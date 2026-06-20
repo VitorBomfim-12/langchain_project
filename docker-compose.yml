@@ -1,18 +1,59 @@
 
 
 services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3367:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    
   caronte-api:
-    image: dockerfile:latest
+    build: .
     container_name: caronte_ai_api
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      # Em vez de mapear direto na raiz /app, vamos mapear simulando a estrutura que seu código espera:
+      - .:/app/langchain_project
+    # Mudamos o diretório de trabalho do container para bater com a estrutura
+    working_dir: /app
     environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-
-      - DB_HOST=172.17.0.1
-      - DB_USER=root
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+     
+    depends_on:
+      - mysql
     restart: always
+  
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      # Expose Ollama API on host port 11434
+      - "11434:11434"
+    volumes:
+      # Persist models between container restarts
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    # Health check to ensure Ollama is responding
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  # Named volume for model persistence
+  ollama_data:

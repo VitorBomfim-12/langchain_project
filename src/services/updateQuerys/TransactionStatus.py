@@ -1,5 +1,5 @@
-from langchain_project.src.services.DbSetup import DataBaseCon as DBC
-from langchain_project.src.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
+from src.services.DbSetup import DataBaseCon as DBC
+from src.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
 import pymysql
 
 class AlterTransaction():

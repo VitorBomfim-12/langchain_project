@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from langchain_project.src.services.DbSetup import DataBaseCon as DBC
-from langchain_project.src.schemas.requestDTOs.OwnerDTO import OwnerDTO
+from src.services.DbSetup import DataBaseCon as DBC
+from src.schemas.requestDTOs.OwnerDTO import OwnerDTO
 import pymysql
 
 

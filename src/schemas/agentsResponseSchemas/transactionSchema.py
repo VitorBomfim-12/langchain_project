@@ -1,6 +1,6 @@
 from pydantic import BaseModel,Field
-from langchain_project.src.models.RiskEnum import RiskEnum
-from langchain_project.src.models.TransactionStatusEnum import StatusEnum
+from src.models.RiskEnum import RiskEnum
+from src.models.TransactionStatusEnum import StatusEnum
 
 class AgentResponse(BaseModel):
     status: StatusEnum

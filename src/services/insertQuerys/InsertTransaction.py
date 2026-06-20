@@ -1,6 +1,6 @@
-from langchain_project.src.services.DbSetup import DataBaseCon as DBC
-from langchain_project.src.schemas.requestDTOs.TransactionDTO import TransactionDTO
-from langchain_project.src.services.selectQuerys.ActiveStoreQuery import ActiveStore
+from src.services.DbSetup import DataBaseCon as DBC
+from src.schemas.requestDTOs.TransactionDTO import TransactionDTO
+from src.services.selectQuerys.ActiveStoreQuery import ActiveStore
 
 import pymysql
 
