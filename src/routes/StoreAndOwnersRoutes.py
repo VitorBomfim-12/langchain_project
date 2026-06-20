@@ -7,13 +7,16 @@ from src.services.selectQuerys.ChargebackPercent import selectChargebackPercent
 from src.services.selectQuerys.SelectAVGValue import getAVGValue
 from src.models.RiskEnum import RiskEnum
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage,HumanMessage,BaseMessage
+from langgraph.graph.message import add_messages
 from langgraph.graph import START,END,StateGraph
 from langgraph.prebuilt import ToolNode
 from langchain_ollama import ChatOllama
-from typing import TypedDict
+from typing import TypedDict,Annotated,Sequence
 from pydantic import BaseModel
-
+from datetime import date
+import os, dotenv
+dotenv.load_dotenv()
 store_and_owner_router = APIRouter(prefix="/store-owner",tags=["store and owners"])
 
 @store_and_owner_router.post("/insert-owner")
@@ -40,54 +43,69 @@ def insertStoreRoute(payload: StoreDTO):
 
 class StoreAnalyzeInfo(BaseModel):
     storeID:int
+    period:list
     reason:str 
 
 class AgentState(TypedDict):
     storeID:int
-    reason:str 
-    response: str
-    storeReputation : str
-    storeRisk : RiskEnum
-    storePoints: int
+    reason:str
+    period:list
+    messages: Annotated[Sequence[BaseMessage], add_messages]
 
 tools =[getAVGValue,selectChargebackPercent]
-model = ChatOllama(model="llama3").bind_tools(tools)
 
-def modelCall(state: AgentState) -> AgentState:
+model = init_chat_modelllm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite",
+    google_api_key=os.getenv("GOOGLE_API_KEY"), 
+    temperature=0
+).bind_tools(tools)
 
-    system_prompt = SystemMessage(content = '''Você é um agente de IA responsável por analisar lojas,ce
-    definir determinados parâmetros para que uma empresa forncedora de máquinas de pagamento (POS)
-    Você deve analizar:
-    -Índices de chargeback, valor médio das transações, desvio padrão do valor médio das transações,
-    CPF que mais comprou na loja,volume de transações por data, compras feitas por CPFs de donos.
-    -Para efetuar estas análises, utilize as Tools disponíveis.
+def modelCall(state: AgentState) -> AgentState: 
+
+    system_prompt = '''Você é um agente de IA responsável por analisar lojas e
+    definir determinados parâmetros para uma empresa fornecedora de máquinas de pagamento (POS).
+    
+    Para efetuar as análises de índices de chargeback e valor médio, utilize as Tools disponíveis passando o ID da loja e o período de análise.
                                   
     O que você deve definir:
-    -Se o estabelecimento é seguro ou não para que a antecipação de crédito (chargeback) 
-    das compras seja feito.
-    -estabelecimento está ápito e atende critérios para obtenção de crédito
+    - Se o estabelecimento é seguro para antecipação de crédito.
+    - Se o estabelecimento está apto para obtenção de crédito.
     
-        Guia de raciocinio:
-            Utilize as Tools com o ID da loja para chamar as Tools e obter informações das lojas.
-            Utilize o resultado das Tools para tomar decisões.
-            Caso não haja dados disponíveis, informe em sua resposta que há falta de dados.''')
-    
-    response = model.invoke([system_prompt] + state['reason'])
-   
-    return {'messages':[response.content]}
+    Guia de raciocínio:
+    - Use o ID da loja e as ferramentas para obter informações.
+    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas'''
+    current_messages = state.get('messages', [])
+        
+    if not current_messages:
+            
+            user_content = f'''ID da Loja a ser analisada: {state['storeID']}\n
+            Motivo da análise: {state['reason']}\n
+            data inicial: {state["period"][0]}\n
+            data final: {state["period"][1]}\n'''
+            messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=user_content)]
+    else:
+        messages = [SystemMessage(content=system_prompt)] + list(current_messages)
 
+    state['messages'] = messages 
+    
+    response = model.invoke([system_prompt] + state["messages"])
+    return {"messages": [response]}
+   
+   
 def toolsLoop(state:AgentState) -> AgentState:
-    lastMessage = state["response"]
+    lastMessage = state["messages"]
     if not lastMessage[-1].tool_calls:
         return 'end'
-    return 'continue'
+    else:
+        return 'continue'
 
 
 toolNode = ToolNode(tools=tools)
 
 graph = StateGraph(AgentState)
 graph.add_node('model call', modelCall)
-graph.add_node('tools loop',toolsLoop)
 graph.add_node('tools node', toolNode)
 
 graph.add_edge(START,'model call')
@@ -101,14 +119,21 @@ graph.add_conditional_edges(
 graph.add_edge('tools node', 'model call')
 app = graph.compile()
 
-@store_and_owner_router.put("/analyze-store")
+@store_and_owner_router.get("/analyze-store")
 def analyzeStore(payload : StoreAnalyzeInfo):
+    print(payload)
+    inputs = {
+          'storeID': payload.storeID, 
+          'reason': payload.reason,
+          'period': payload.period
+      }
     
-    response = app.invoke({'storeID':payload.storeID,
-                'reason':payload.reason})
-    print(response.content)
-    return {'Resposta':response.content}
-
+    final_state = app.invoke(inputs) 
+    final_message = final_state["messages"][-1]
+      
+    print(final_message.content)
+    return {'Resposta': final_message.content}
+  
     
 
    

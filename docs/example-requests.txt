@@ -1,0 +1,7 @@
+{"storeName":"loja de teste 1",
+"storeType":"mercado",
+"cnpj":"00.000.000/0001-00",
+"mccCode":"345",
+ "transactionValueLimit":500.00,
+"location":[-23.1791, -45.8872]
+}

@@ -16,11 +16,12 @@ def getAVGValue(storeID:int,initialDate:datetime,finalDate:datetime)->str:
         con = DBC.db_connect()
         with con.cursor() as cur:
             sql = '''SELECT 
-            AVG(transaction_value) as avg_value,
-            FROM transactions
-            WHERE transaction_store_id_FK =v%s AND transaction_date BETWEEN %s AND %s
+         AVG(transaction_value) as avg_value
+        FROM transactions
+        WHERE transaction_store_id_FK = %s 
+        AND transaction_date BETWEEN %s AND %s
             '''
-            cur.execute(sql,storeID,initialDate,finalDate)
+            cur.execute(sql,(storeID,initialDate,finalDate))
             response = cur.fetchone()
             return response
         

@@ -21,5 +21,5 @@ def insertOwner(t: OwnerDTO):
             raise HTTPException(status_code=409, detail="Valores já existentes no banco de dados.")
         return "Erro no banco de dados."
     finally:
-        if con and con.open:
+        if con.open:
             con.close()

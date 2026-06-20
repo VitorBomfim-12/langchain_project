@@ -23,5 +23,5 @@ class InsertStoreAndOwners:
             return "Erro no banco de dados"
         
         finally:
-            if con and con.open:
+            if con.open:
                 con.close()
