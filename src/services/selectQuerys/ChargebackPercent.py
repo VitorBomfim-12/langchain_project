@@ -1,5 +1,5 @@
 from src.services.DbSetup import DataBaseCon as DBC
-from datetime import datetime
+from datetime import datetime,time
 from langchain.tools import tool
 import pymysql
 
@@ -24,9 +24,10 @@ def selectChargebackPercent(storeID:int,initialDate:datetime,finalDate:datetime)
                    (COUNT(CASE WHEN transaction_status = 'CHARGEBACK' THEN 1 END) / COUNT(*)) * 100 as tax_chargeback
                 
                     FROM transactions
-                    WHERE transaction_store_id_FK = %s and transaction_date BETWEEN %s and %s
-                 '''
-            cur.execute(sql,(storeID,initialDate,finalDate))
+                    WHERE transaction_store_id_FK = %s and transaction_date BETWEEN %s and %s'''
+            initialDateQuery = datetime.combine(initialDate.date(),time.max)
+            finalDateQuery = datetime.combine(finalDate.date(),time.max)
+            cur.execute(sql,(storeID,initialDateQuery,finalDateQuery))
             response = cur.fetchall()
             
             if response:

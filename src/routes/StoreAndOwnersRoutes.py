@@ -54,12 +54,13 @@ class AgentState(TypedDict):
 
 tools =[getAVGValue,selectChargebackPercent]
 
-model = init_chat_modelllm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
-    google_api_key=os.getenv("GOOGLE_API_KEY"), 
-    temperature=0
-).bind_tools(tools)
+#model = init_chat_modelllm = ChatGoogleGenerativeAI(
+#    model="gemini-2.5-flash-lite",
+#    google_api_key=os.getenv("GOOGLE_API_KEY"), 
+#    temperature=0
+#).bind_tools(tools)
 
+model = ChatOllama(model="llama3.1:8b-instruct-q4_K_M").bind_tools(tools)
 def modelCall(state: AgentState) -> AgentState: 
 
     system_prompt = '''Você é um agente de IA responsável por analisar lojas e
@@ -73,7 +74,7 @@ def modelCall(state: AgentState) -> AgentState:
     
     Guia de raciocínio:
     - Use o ID da loja e as ferramentas para obter informações.
-    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas'''
+    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas.'''
     current_messages = state.get('messages', [])
         
     if not current_messages:
@@ -90,7 +91,7 @@ def modelCall(state: AgentState) -> AgentState:
 
     state['messages'] = messages 
     
-    response = model.invoke([system_prompt] + state["messages"])
+    response = model.invoke(state["messages"])
     return {"messages": [response]}
    
    
@@ -119,13 +120,14 @@ graph.add_conditional_edges(
 graph.add_edge('tools node', 'model call')
 app = graph.compile()
 
-@store_and_owner_router.get("/analyze-store")
+@store_and_owner_router.post("/analyze-store")
 def analyzeStore(payload : StoreAnalyzeInfo):
-    print(payload)
+   
     inputs = {
           'storeID': payload.storeID, 
           'reason': payload.reason,
-          'period': payload.period
+          'period': payload.period,
+          'messages':[]
       }
     
     final_state = app.invoke(inputs) 

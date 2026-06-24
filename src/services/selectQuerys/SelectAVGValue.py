@@ -1,5 +1,5 @@
 from src.services.DbSetup import DataBaseCon as DBC
-from datetime import datetime
+from datetime import datetime,time
 from langchain.tools import tool
 import pymysql
 
@@ -21,7 +21,10 @@ def getAVGValue(storeID:int,initialDate:datetime,finalDate:datetime)->str:
         WHERE transaction_store_id_FK = %s 
         AND transaction_date BETWEEN %s AND %s
             '''
-            cur.execute(sql,(storeID,initialDate,finalDate))
+
+            initialDateQuery = datetime.combine(initialDate.date(),time.min)
+            finalDateQuery = datetime.combine(finalDate.date(),time.max)
+            cur.execute(sql,(storeID,initialDateQuery,finalDateQuery))
             response = cur.fetchone()
             return response
         
