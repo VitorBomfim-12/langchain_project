@@ -24,17 +24,17 @@ birthday DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS store_owners(
-owners_id INT,
+owner_id INT,
 store_id INT,
-PRIMARY KEY(owners_id,store_id),
-FOREIGN KEY (owners_id) REFERENCES owners(id) ON DELETE CASCADE,
-FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+PRIMARY KEY(owner_id,store_id),
+CONSTRAINT owner_id FOREIGN KEY REFERENCES owner(id) ON DELETE CASCADE
+CONSTRAINT store_id FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS transactions(
 id INT PRIMARY KEY AUTO_INCREMENT,
 transaction_value DECIMAL(19, 4) NOT NULL,
-transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP(),
 transaction_cpf VARCHAR(255) NOT NULL,
 transaction_location POINT NOT NULL SRID 4326,
 SPATIAL INDEX (transaction_location),
@@ -42,16 +42,15 @@ transaction_status ENUM('PENDING','APPROVED','REJECTED','CHARGEBACK') DEFAULT 'P
 transaction_risk ENUM('LOW','MEDIUM','HIGH') DEFAULT 'LOW',
 reason TEXT,
 transaction_store_id_FK INT,
-FOREIGN KEY (transaction_store_id_FK) REFERENCES store(id) ON DELETE CASCADE
+CONSTRAINT transaction_store_id_FK FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS blacklist(
 id INT PRIMARY KEY AUTO_INCREMENT,
 identifier VARCHAR(255) NOT NULL,
-added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+added_at  DATETIME DEFAULT CURRENT_TIMESTAMP(),
 severity_level ENUM('LOW','MEDIUM','HIGH'),
-store_id_FK INT NOT NULL,
-FOREIGN KEY (store_id_FK) REFERENCES store(id) ON DELETE CASCADE,
+CONSTRAINT store_id_fk FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE,
 reason TEXT
 );
 
@@ -62,6 +61,6 @@ average_transaction_value DECIMAL(19, 4),
 risk_level ENUM('LOW', 'MEDIUM', 'HIGH') DEFAULT 'LOW',
 store_points INT,
 reason TEXT,
-FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+CONSTRAINT store_id FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
 );
 
