@@ -11,11 +11,8 @@ from decimal import Decimal
 from src.schemas.requestDTOs.TransactionDTO import TransactionDTO
 from src.services.updateQuerys.TransactionStatus import AlterTransaction
 from src.schemas.requestDTOs.TransactionStatusDTO import TransactionStatus
-
-
 import os
 
-    
 transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes'])
 
 @transaction_router.post("/insert")
