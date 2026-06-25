@@ -23,28 +23,27 @@ def insertTransaction(payload: TransactionDTO):
     message = ''
     
     if not ActiveStore(payload.storeID):
-        message += '\n Estabelecimento inativo.'
+        message += '\n Estabelecimento inativo ou inexistente.'
         statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
+        storeInfo = StoreLocation.GetLocation(payload.storeID)
 
     elif payload.value>StoreLimitQuery.storeLimit(payload.storeID):
         message += '\n Limite do estabelecimento excedido.'
-        statusTransaction = StatusEnum.PENDING
+        statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
     elif (datetime.now().hour > 23 or datetime.now().hour < 6) and payload.value> Decimal('200.00'):
         message += '\n Limite noturno excedido.'
-        statusTransaction = StatusEnum.PENDING
+        statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
 
     elif payload.value <= Decimal('2.00'):
-        message += '\n Transação suspeita: valor jabaixo do piso mínimo de segurança.'
-        statusTransaction = StatusEnum.PENDING
+        message += '\n Transação suspeita: valor abaixo do piso mínimo de segurança.'
+        statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.MEDIUM
 
-    storeInfo = StoreLocation.GetLocation(payload.storeID)
-    
-    if storeInfo:
+    elif storeInfo:
         dStoreTransaction = calcHaversine(payload.location[0],
                                           payload.location[1],
                                           storeInfo['lat'],
@@ -58,9 +57,9 @@ def insertTransaction(payload: TransactionDTO):
             statusTransaction = StatusEnum.PENDING
             risk = RiskEnum.HIGH
     else:
-        message+="Erro na localização da transação."
-        risk = RiskEnum.HIGH
-        statusTransaction = StatusEnum.REJECTED
+        message+="Transação segura"
+        risk = RiskEnum.LOW
+        statusTransaction = StatusEnum.APPROVED
         
 
     payload.reason = message  
