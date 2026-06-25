@@ -20,7 +20,7 @@ class InsertTransaction:
                 transaction_status,
                 transaction_risk,
                 reason,
-                transaction_store_id_FK)
+                transaction_store_id)
 
                 VALUES (%s,%s,%s,ST_PointFromText(%s, 4326),%s,%s,%s,%s)'''
 

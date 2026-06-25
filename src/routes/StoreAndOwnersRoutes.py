@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from datetime import date
 import os, dotenv
 dotenv.load_dotenv()
-store_and_owner_router = APIRouter(prefix="/store-owner",tags=["store and owners"])
+store_and_owner_router = APIRouter(prefix="/clients",tags=["store and owners"])
 
 @store_and_owner_router.post("/insert-owner")
 def insertOwnerRoute(payload : OwnerDTO):

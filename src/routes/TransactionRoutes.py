@@ -17,8 +17,11 @@ transaction_router = APIRouter(prefix="/transaction",tags=['Transaction routes']
 
 @transaction_router.post("/insert")
 def insertTransaction(payload: TransactionDTO):
-    
+
+    statusTransaction = StatusEnum.PENDING
+    risk = RiskEnum.LOW
     message = ''
+    
     if not ActiveStore(payload.storeID):
         message += '\n Estabelecimento inativo.'
         statusTransaction = StatusEnum.REJECTED
