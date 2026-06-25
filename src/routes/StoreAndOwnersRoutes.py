@@ -60,21 +60,38 @@ tools =[getAVGValue,selectChargebackPercent]
 #    temperature=0
 #).bind_tools(tools)
 
-model = ChatOllama(model="llama3.1:8b-instruct-q4_K_M").bind_tools(tools)
+model = ChatOllama(model="llama3.1:8b-instruct-q4_K_M",
+                   num_predict=128,
+                   num_thread=2).bind_tools(tools)
 def modelCall(state: AgentState) -> AgentState: 
 
     system_prompt = '''Você é um agente de IA responsável por analisar lojas e
-    definir determinados parâmetros para uma empresa fornecedora de máquinas de pagamento (POS).
+    definir determinados parâmetros de segurança para uma empresa fornecedora de máquinas de pagamento (POS).
     
     Para efetuar as análises de índices de chargeback e valor médio, utilize as Tools disponíveis passando o ID da loja e o período de análise.
                                   
+    Input:
+    storeID - id do estabelecimento, use para as consultas.
+    period - Lista com o período inicial e final para fazer as consultas.
+    reason - Texto com observações para levar em consideração na análise dos dados.
+
+    
+    Guia de raciocínio:
+    - Use o ID da loja e as ferramentas para obter informações.
+    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas.
+
     O que você deve definir:
     - Se o estabelecimento é seguro para antecipação de crédito.
     - Se o estabelecimento está apto para obtenção de crédito.
     
-    Guia de raciocínio:
-    - Use o ID da loja e as ferramentas para obter informações.
-    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas.'''
+    Output:
+    Risco do estabelecimento: classifique o risco.
+    Aptidão para antecipação de crédito: classifique se o estabelecimento esta apto para antecipação
+    de crédito, utilize o indice de chargeback.
+    observações: observações adicionais que não se encaixam nos campos anteriores.
+
+    Não retorne nada além dos campos indicados no Output.
+'''
     current_messages = state.get('messages', [])
         
     if not current_messages:

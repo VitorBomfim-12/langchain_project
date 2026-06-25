@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS financial_data;
 CREATE DATABASE IF NOT EXISTS financial_data;
 
 USE financial_data;
@@ -11,7 +12,7 @@ mcc_code VARCHAR (20) NOT NULL,
 transaction_value_limit DECIMAL(19, 4),
 is_active BOOL DEFAULT TRUE,
 eletronic_fence DECIMAL(8, 2) NOT NULL DEFAULT 500.00,
-location POINT NOT NULL SRID 4326,
+location POINT NOT NULL,
 SPATIAL INDEX (location)
 );
 
@@ -27,8 +28,8 @@ CREATE TABLE IF NOT EXISTS store_owners(
 owner_id INT,
 store_id INT,
 PRIMARY KEY(owner_id,store_id),
-CONSTRAINT owner_id FOREIGN KEY REFERENCES owner(id) ON DELETE CASCADE
-CONSTRAINT store_id FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
+CONSTRAINT owner_id_fk FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE,
+CONSTRAINT store_id_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS transactions(
@@ -36,31 +37,31 @@ id INT PRIMARY KEY AUTO_INCREMENT,
 transaction_value DECIMAL(19, 4) NOT NULL,
 transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP(),
 transaction_cpf VARCHAR(255) NOT NULL,
-transaction_location POINT NOT NULL SRID 4326,
+transaction_location POINT NOT NULL,
 SPATIAL INDEX (transaction_location),
 transaction_status ENUM('PENDING','APPROVED','REJECTED','CHARGEBACK') DEFAULT 'PENDING',
 transaction_risk ENUM('LOW','MEDIUM','HIGH') DEFAULT 'LOW',
 reason TEXT,
-transaction_store_id_FK INT,
-CONSTRAINT transaction_store_id_FK FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS blacklist(
-id INT PRIMARY KEY AUTO_INCREMENT,
-identifier VARCHAR(255) NOT NULL,
-added_at  DATETIME DEFAULT CURRENT_TIMESTAMP(),
-severity_level ENUM('LOW','MEDIUM','HIGH'),
-CONSTRAINT store_id_fk FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE,
-reason TEXT
+transaction_store_id INT,
+CONSTRAINT transaction_store_id_FK FOREIGN KEY (transaction_store_id) REFERENCES store(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS store_metrics (
-store_id INT PRIMARY KEY,
+store_id INT,
 total_chargebacks INT DEFAULT 0, 
 average_transaction_value DECIMAL(19, 4),   
 risk_level ENUM('LOW', 'MEDIUM', 'HIGH') DEFAULT 'LOW',
 store_points INT,
 reason TEXT,
-CONSTRAINT store_id FOREIGN KEY REFERENCES store(id) ON DELETE CASCADE
+CONSTRAINT store_id_st_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS blacklist(
+id INT PRIMARY KEY AUTO_INCREMENT,
+added_at  DATETIME DEFAULT CURRENT_TIMESTAMP(),
+severity_level ENUM('LOW','MEDIUM','HIGH'),
+store_id INT NOT NULL,
+reason TEXT,
+CONSTRAINT store_id_bl_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
 );
 
