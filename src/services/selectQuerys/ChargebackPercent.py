@@ -24,7 +24,7 @@ def selectChargebackPercent(storeID:int,initialDate:datetime,finalDate:datetime)
                    (COUNT(CASE WHEN transaction_status = 'CHARGEBACK' THEN 1 END) / COUNT(*)) * 100 as tax_chargeback
                 
                     FROM transactions
-                    WHERE transaction_store_id_FK = %s and transaction_date BETWEEN %s and %s'''
+                    WHERE transaction_store_id = %s and transaction_date BETWEEN %s and %s'''
             initialDateQuery = datetime.combine(initialDate.date(),time.max)
             finalDateQuery = datetime.combine(finalDate.date(),time.max)
             cur.execute(sql,(storeID,initialDateQuery,finalDateQuery))

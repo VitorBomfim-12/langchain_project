@@ -5,3 +5,12 @@
  "transactionValueLimit":500.00,
 "location":[-23.1791, -45.8872]
 }
+
+{"value":100.20,
+"data":	"2026-05-21T12:05:40.0000",
+"cpf":"38288945325",
+"location":[-70.8872 ,-93.1791],
+"status":"PENDING",
+"risk":"LOW",
+"reason":"teste",
+"storeID":8}

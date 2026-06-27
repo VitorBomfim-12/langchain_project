@@ -18,7 +18,7 @@ def getAVGValue(storeID:int,initialDate:datetime,finalDate:datetime)->str:
             sql = '''SELECT 
          AVG(transaction_value) as avg_value
         FROM transactions
-        WHERE transaction_store_id_FK = %s 
+        WHERE transaction_store_id = %s 
         AND transaction_date BETWEEN %s AND %s
             '''
 

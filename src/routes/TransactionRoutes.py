@@ -4,7 +4,7 @@ from src.services.selectQuerys.ActiveStoreQuery import ActiveStore
 from src.services.selectQuerys.SelectLimitValue import StoreLimitQuery
 from src.services.insertQuerys.InsertTransaction import InsertTransaction as it
 from src.models.TransactionStatusEnum import StatusEnum
-from src.services.selectQuerys.SelectStoreLocation import StoreLocation
+from src.services.selectQuerys.SelectStoreLocation import GetLocation
 from src.models.RiskEnum import RiskEnum
 from src.services.calcHaversine import calcHaversine
 from decimal import Decimal
@@ -23,12 +23,13 @@ def insertTransaction(payload: TransactionDTO):
     message = ''
     
     if not ActiveStore(payload.storeID):
-        message += '\n Estabelecimento inativo ou inexistente.'
-        statusTransaction = StatusEnum.REJECTED
-        risk = RiskEnum.HIGH
-        storeInfo = StoreLocation.GetLocation(payload.storeID)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail= "Estabelecimento inativo ou inexistente.")
+    
+    storeInfo = GetLocation(payload.storeID)
 
-    elif payload.value>StoreLimitQuery.storeLimit(payload.storeID):
+    if payload.value>StoreLimitQuery.storeLimit(payload.storeID):
         message += '\n Limite do estabelecimento excedido.'
         statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.HIGH
@@ -42,7 +43,7 @@ def insertTransaction(payload: TransactionDTO):
         message += '\n Transação suspeita: valor abaixo do piso mínimo de segurança.'
         statusTransaction = StatusEnum.REJECTED
         risk = RiskEnum.MEDIUM
-
+        
     elif storeInfo:
         dStoreTransaction = calcHaversine(payload.location[0],
                                           payload.location[1],
@@ -50,8 +51,8 @@ def insertTransaction(payload: TransactionDTO):
                                           storeInfo['lon'])
     
         if dStoreTransaction > storeInfo['fence_dis']:
-            message += f'''Transação suspeita: cerca eletrônica violada,
-            a compra foi feita a distância de {dStoreTransaction:.2f} metros do local da sede
+            message += f'''Cerca eletrônica violada, a compra foi feita a distância de 
+            {dStoreTransaction:.2f} metros do local da sede
             do estabelecimento
             '''
             statusTransaction = StatusEnum.PENDING
@@ -82,19 +83,19 @@ def insertTransaction(payload: TransactionDTO):
 def alterTransactionStatus(payload : TransactionStatus):
     
     try:
-        success = AlterTransaction.alterTransaction(payload)
+        attempt = AlterTransaction.alterTransaction(payload)
         
-        if not success:
+        if attempt =="Erro no banco de dados.":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Transação com o ID {payload.transaction_id} não foi encontrada no sistema."
-            )
-            
-        return {"status": "Sucesso.", 
-                "message": "Status atualizado com sucesso."}
-
+                 detail= f"Erro interno ao acessar o banco de dados."
+                 )
+        
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail= f"Erro interno ao acessar o banco de dados: {str(e)}"
                             )
+    finally:
+        return {"status": "Sucesso.", 
+                "message": "Status atualizado com sucesso."}

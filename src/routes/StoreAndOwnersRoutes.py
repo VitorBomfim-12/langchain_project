@@ -15,6 +15,7 @@ from langchain_ollama import ChatOllama
 from typing import TypedDict,Annotated,Sequence
 from pydantic import BaseModel
 from datetime import date
+import time
 import os, dotenv
 dotenv.load_dotenv()
 store_and_owner_router = APIRouter(prefix="/clients",tags=["store and owners"])
@@ -49,70 +50,59 @@ class StoreAnalyzeInfo(BaseModel):
 class AgentState(TypedDict):
     storeID:int
     reason:str
-    period:list
+    period:list[date]
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
 tools =[getAVGValue,selectChargebackPercent]
 
-#model = init_chat_modelllm = ChatGoogleGenerativeAI(
-#    model="gemini-2.5-flash-lite",
-#    google_api_key=os.getenv("GOOGLE_API_KEY"), 
-#    temperature=0
-#).bind_tools(tools)
+model = init_chat_modelllm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"), 
+    temperature=0
+).bind_tools(tools)
 
-model = ChatOllama(model="llama3.1:8b-instruct-q4_K_M",
-                   num_predict=128,
-                   num_thread=2).bind_tools(tools)
 def modelCall(state: AgentState) -> AgentState: 
-
+    print(state)
     system_prompt = '''Você é um agente de IA responsável por analisar lojas e
-    definir determinados parâmetros de segurança para uma empresa fornecedora de máquinas de pagamento (POS).
+    definir determinados parâmetros para uma empresa fornecedora de máquinas de pagamento (POS).
     
     Para efetuar as análises de índices de chargeback e valor médio, utilize as Tools disponíveis passando o ID da loja e o período de análise.
                                   
-    Input:
-    storeID - id do estabelecimento, use para as consultas.
-    period - Lista com o período inicial e final para fazer as consultas.
-    reason - Texto com observações para levar em consideração na análise dos dados.
-
-    
-    Guia de raciocínio:
-    - Use o ID da loja e as ferramentas para obter informações.
-    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas.
-
     O que você deve definir:
     - Se o estabelecimento é seguro para antecipação de crédito.
     - Se o estabelecimento está apto para obtenção de crédito.
     
-    Output:
-    Risco do estabelecimento: classifique o risco.
-    Aptidão para antecipação de crédito: classifique se o estabelecimento esta apto para antecipação
-    de crédito, utilize o indice de chargeback.
-    observações: observações adicionais que não se encaixam nos campos anteriores.
-
-    Não retorne nada além dos campos indicados no Output.
-'''
+    Guia de raciocínio:
+    - Use o ID da loja e as ferramentas para obter informações.
+    - Use, OBRIGATORIAMENTE, as tools que lhe foram passadas'''
+    
     current_messages = state.get('messages', [])
         
     if not current_messages:
-            
-            user_content = f'''ID da Loja a ser analisada: {state['storeID']}\n
-            Motivo da análise: {state['reason']}\n
-            data inicial: {state["period"][0]}\n
-            data final: {state["period"][1]}\n'''
-            messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=user_content)]
-    else:
-        messages = [SystemMessage(content=system_prompt)] + list(current_messages)
+        # PRIMEIRA RODADA
+        user_content = f'''ID da Loja a ser analisada: {state['storeID']}
+        Motivo da análise: {state['reason']}
+        data inicial: {state["period"][0]}
+        data final: {state["period"][1]}'''
+        
+        human_msg = HumanMessage(content=user_content)
 
-    state['messages'] = messages 
-    
-    response = model.invoke(state["messages"])
-    return {"messages": [response]}
-   
+        messages_to_send = [SystemMessage(content=system_prompt), human_msg]
+        response = model.invoke(messages_to_send)
+
+        return {"messages": [human_msg, response]}
+        
+    else:
+        
+        messages_to_send = [SystemMessage(content=system_prompt)] + current_messages
+        response = model.invoke(messages_to_send)
+        
+      
+        return {"messages": [response]}
+
    
 def toolsLoop(state:AgentState) -> AgentState:
+    
     lastMessage = state["messages"]
     if not lastMessage[-1].tool_calls:
         return 'end'
@@ -139,7 +129,7 @@ app = graph.compile()
 
 @store_and_owner_router.post("/analyze-store")
 def analyzeStore(payload : StoreAnalyzeInfo):
-   
+    print(payload)
     inputs = {
           'storeID': payload.storeID, 
           'reason': payload.reason,
