@@ -10,22 +10,22 @@ class AlterTransaction():
         try:
             con = DBC.db_connect()
             with con.cursor() as cur:
-                sql = """UPDATE transactions
-                SET transaction_status = CASE 
-                    WHEN 
-                     transaction_status <> %s 
-                    THEN %s 
-                    else transaction_status
-                END
-                WHERE id = %s
-                """
-                params = (t.status,t.status,t.transactionID)
+                sql = """UPDATE transactions 
+                SET 
+                    transaction_status = %s, 
+                    reason = %s 
+                    WHERE id =%s and transaction_status !=%s"""
+                params = (t.status,t.reason,t.transactionID,t.status)
                 cur.execute (sql,params)
+               
                 con.commit()
-                return 'Sucesso.'     
+                if cur.rowcount == 0:
+                    return "Status não alterado."
+                return "Sucesso."        
+            
         except pymysql.MySQLError as e:
-            print(e)
-            return "Erro no banco de dados."
+            print(f"Erro :{e}")
+            return "Erro no banco de dados"
         
         finally:
                 con.close()

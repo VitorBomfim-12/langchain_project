@@ -85,17 +85,23 @@ def alterTransactionStatus(payload : TransactionStatus):
     try:
         attempt = AlterTransaction.alterTransaction(payload)
         
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail= f"Erro interno do servidor."
+                            )
+    finally:
+
         if attempt =="Erro no banco de dados.":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                  detail= f"Erro interno ao acessar o banco de dados."
                  )
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail= f"Erro interno ao acessar o banco de dados: {str(e)}"
-                            )
-    finally:
-        return {"status": "Sucesso.", 
-                "message": "Status atualizado com sucesso."}
+        if attempt == "Status não alterado.":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                 detail= """Status não alterado, a transação pode ser inexistente ou ja contém o status passado."""
+                 )
+        else:
+            return {"status": "Sucesso.", 
+                    "message": "Status atualizado com sucesso."}
