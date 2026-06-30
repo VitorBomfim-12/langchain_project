@@ -65,3 +65,12 @@ reason TEXT,
 CONSTRAINT store_id_bl_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS blocked_cpfs(
+store_id INT NOT NULL,
+owner_id INT NOT NULL,
+reason TEXT NOT NULL,
+blocked_at DATE NOT NULL
+CONSTRAINT owner_id_block_fk FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE,
+CONSTRAINT store_id_block_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+)
+

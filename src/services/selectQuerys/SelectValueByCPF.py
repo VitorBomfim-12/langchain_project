@@ -7,7 +7,7 @@ def selectValueByCPF(cpf:str):
     '''Essa função retorna um relatório de compras em um CPF, feitas num intervalo de um dia, contando a partir do momento em
     que a função é chamada
        Argumentos:
-       cpf:inteiro - insere o CPF a ser analisado.'''
+       cpf: str (CPF a ser analisado)'''
     try:
         con = DBC.db_connect()
         with con.cursor() as cur:
@@ -21,7 +21,7 @@ def selectValueByCPF(cpf:str):
             AND transaction_cpf = %s
             GROUP BY transaction_cpf
                     '''
-            cur.execute(sql,(cpf,))
+            cur.execute(sql,(cpf))
             response = cur.fetchall()
             if response:
                     data = response[0]

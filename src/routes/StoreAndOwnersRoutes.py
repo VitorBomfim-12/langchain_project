@@ -56,9 +56,10 @@ tools =[getAVGValue,selectChargebackPercent]
 class agentResponse(BaseModel):
     storeRiskChargeback :str = Field(description="Definir o risco para antecipação de crédito proveniente de vendas")
     storeCredit:str = Field(description="Definir se o estabelecimento está apto a captar crédito.")
+    generalRisk: RiskEnum = Field(description="Classifique conforme o Enum, o risco geral do estabelecimento.")
     reason:str = Field(description="""Explique de maneira curta e objetiva as razões pelas quais os status foram definidos,
     cite estatísticas e padrões encontrados.""")
-    
+
 system_prompt = '''Você é um agente de IA responsável por analisar lojas e
     definir determinados parâmetros para uma empresa fornecedora de máquinas de pagamento (POS).
     
@@ -95,9 +96,11 @@ def analyzeStore(payload : StoreAnalyzeInfo):
         result = agent.invoke({"messages":[{"role":"user",
                                             "content":inputs}]})
         print (result["structured_response"])
-        return {"status":result["structured_response"]}
+        return {"status":"Sucesso.",
+                "resultado da analise":result["structured_response"]}
+    
     except Exception as e:
         print (e)
-        return {"status":"erro"}
+        return {"status":f"erro{e}"}
 
    
