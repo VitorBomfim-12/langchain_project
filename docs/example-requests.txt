@@ -14,3 +14,11 @@
 "risk":"LOW",
 "reason":"teste",
 "storeID":8}
+
+{"transactionID":12,
+"status":"APPROVED",
+"reason":"teste do agente"}
+
+{"storeID":1,
+"period":["2026-01-21","2026-06-21"],
+"reason":"teste do agente, faça o seu melhor"}
