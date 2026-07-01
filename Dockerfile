@@ -1,13 +1,14 @@
+FROM python:3.12-slim
 
-FROM python:3.14
+WORKDIR /app
 
-WORKDIR /first_project
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-COPY . .
+COPY . ./langchain_project
 
 EXPOSE 8000
-CMD ["fastapi", "run", "main.py","--host", "0.0.0.0", "--port", "8000"]
+
+ENV PYTHONPATH=/app
+
+CMD ["fastapi", "run", "langchain_project/main.py", "--host", "0.0.0.0", "--port", "8000"]

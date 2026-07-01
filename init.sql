@@ -1,0 +1,76 @@
+DROP DATABASE IF EXISTS financial_data;
+CREATE DATABASE IF NOT EXISTS financial_data;
+
+USE financial_data;
+
+CREATE TABLE IF NOT EXISTS store(
+id INT PRIMARY KEY AUTO_INCREMENT,
+store_name VARCHAR(255) NOT NULL UNIQUE,
+store_type VARCHAR(100) NOT NULL,
+cnpj VARCHAR(255) NOT NULL UNIQUE,
+mcc_code VARCHAR (20) NOT NULL,
+transaction_value_limit DECIMAL(19, 4),
+is_active BOOL DEFAULT TRUE,
+eletronic_fence DECIMAL(8, 2) NOT NULL DEFAULT 500.00,
+location POINT NOT NULL,
+SPATIAL INDEX (location)
+);
+
+CREATE TABLE IF NOT EXISTS owners(
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+cpf VARCHAR(255) NOT NULL UNIQUE,
+birthday DATE NOT NULL
+
+);
+
+CREATE TABLE IF NOT EXISTS store_owners(
+owner_id INT,
+store_id INT,
+PRIMARY KEY(owner_id,store_id),
+CONSTRAINT owner_id_fk FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE,
+CONSTRAINT store_id_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS transactions(
+id INT PRIMARY KEY AUTO_INCREMENT,
+transaction_value DECIMAL(19, 4) NOT NULL,
+transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP(),
+transaction_cpf VARCHAR(255) NOT NULL,
+transaction_location POINT NOT NULL,
+SPATIAL INDEX (transaction_location),
+transaction_status ENUM('PENDING','APPROVED','REJECTED','CHARGEBACK') DEFAULT 'PENDING',
+transaction_risk ENUM('LOW','MEDIUM','HIGH') DEFAULT 'LOW',
+reason TEXT,
+transaction_store_id INT,
+CONSTRAINT transaction_store_id_FK FOREIGN KEY (transaction_store_id) REFERENCES store(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS store_metrics (
+store_id INT,
+total_chargebacks INT DEFAULT 0, 
+average_transaction_value DECIMAL(19, 4),   
+risk_level ENUM('LOW', 'MEDIUM', 'HIGH') DEFAULT 'LOW',
+store_points INT,
+reason TEXT,
+CONSTRAINT store_id_st_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS blacklist(
+id INT PRIMARY KEY AUTO_INCREMENT,
+added_at  DATETIME DEFAULT CURRENT_TIMESTAMP(),
+severity_level ENUM('LOW','MEDIUM','HIGH'),
+store_id INT NOT NULL,
+reason TEXT,
+CONSTRAINT store_id_bl_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS blocked_cpfs(
+store_id INT NOT NULL,
+owner_id INT NOT NULL,
+reason TEXT NOT NULL,
+blocked_at DATE NOT NULL
+CONSTRAINT owner_id_block_fk FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE,
+CONSTRAINT store_id_block_fk FOREIGN KEY (store_id) REFERENCES store(id) ON DELETE CASCADE
+)
+

@@ -1,0 +1,24 @@
+{"storeName":"loja de teste 1",
+"storeType":"mercado",
+"cnpj":"00.000.000/0001-00",
+"mccCode":"345",
+ "transactionValueLimit":500.00,
+"location":[-23.1791, -45.8872]
+}
+
+{"value":100.20,
+"data":	"2026-05-21T12:05:40.0000",
+"cpf":"38288945325",
+"location":[-70.8872 ,-93.1791],
+"status":"PENDING",
+"risk":"LOW",
+"reason":"teste",
+"storeID":8}
+
+{"transactionID":12,
+"status":"APPROVED",
+"reason":"teste do agente"}
+
+{"storeID":1,
+"period":["2026-01-21","2026-06-21"],
+"reason":"teste do agente, faça o seu melhor"}
