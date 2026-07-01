@@ -1,11 +1,13 @@
 from fastapi import APIRouter,HTTPException,status
 from src.schemas.requestDTOs.OwnerDTO import OwnerDTO
 from src.schemas.requestDTOs.StoreDTO import StoreDTO
+from src.schemas.requestDTOs.StoreAndOwnersDTO import StoreAndOwnersDTO
 from src.schemas.requestDTOs.StoreAnalysisDTO import StoreAnalyzeInfo
 from src.services.insertQuerys.InsertOwner import insertOwner
 from src.services.insertQuerys.InsertStore import insertStore
-from src.agents.agent import create_caronte_agent
-from src.agents.prompts import store_analysis_prompt
+from src.services.insertQuerys.InsertStoreAndOwners import insertStoreAndOwners
+from src.agents.Agent import create_caronte_agent
+from src.agents.Prompts import store_analysis_prompt
 from src.schemas.responseDTOs.AgentResponse import agentResponse
 
 store_and_owner_router = APIRouter(prefix="/clients",tags=["store and owners"])
@@ -33,6 +35,23 @@ def insertStoreRoute(payload: StoreDTO):
     return {"status":"sucesso."}
 
 
+@store_and_owner_router.post("/insert-store-owner")
+def insertStoreOwnerRoute(payload : StoreAndOwnersDTO):
+    response = insertStoreAndOwners(payload)
+    if response == "Estabelecimento inativo.":
+        raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                 detail= f"Estabelecimento inativo ou inexistente."
+                 )
+    elif response == "Erro no banco de dados":
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail= f"Erro interno ao acessar o banco de dados."         
+        )
+    else:
+        return {"status":"sucesso."}
+        
+ 
 @store_and_owner_router.post("/analyze-store")
 def analyzeStore(payload : StoreAnalyzeInfo):
     print(payload)
