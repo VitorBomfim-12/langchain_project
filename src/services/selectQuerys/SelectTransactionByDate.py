@@ -19,8 +19,8 @@ def selectTransaction(storeID:int,initialDate: datetime,finalDate: datetime):
         with con.cursor() as cur:
             sql = '''SELECT * 
                             FROM transactions 
-                            WHERE transaction_store_id_FK  = %s AND 
-                            transaction_date BETWEEN %s and %s'''
+                            WHERE transaction_store_id  = %s AND 
+                            transaction_date BETWEEN %s AND %s'''
             
             
             initialDateQuery = datetime.combine(initialDate.date(),time.max)
